@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/lib/ThemeProvider";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import MobileNav from "@/components/layout/MobileNav";
-import WhatsAppFloat from "@/components/ui/WhatsAppFloat";
+import StorefrontShell from "@/components/layout/StorefrontShell";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -53,11 +50,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen flex flex-col">
         <ThemeProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <MobileNav />
-          <WhatsAppFloat />
+          <StorefrontShell>{children}</StorefrontShell>
         </ThemeProvider>
       </body>
     </html>

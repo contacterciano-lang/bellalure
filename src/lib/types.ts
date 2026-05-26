@@ -40,6 +40,126 @@ export interface CategoryInfo {
   image: string;
 }
 
+/* ─── Orders ─── */
+export type OrderStatus =
+  | 'nouveau'
+  | 'confirme'
+  | 'acompte_paye'
+  | 'commande_fournisseur'
+  | 'en_transit'
+  | 'arrive_kinshasa'
+  | 'livre'
+  | 'annule';
+
+export type PaymentMethod =
+  | 'mobile_money'
+  | 'airtel_money'
+  | 'orange_money'
+  | 'wave'
+  | 'cash';
+
+export interface OrderItem {
+  productId: string;
+  productName: string;
+  productImage: string;
+  quantity: number;
+  size?: string;
+  color?: string;
+  unitPrice: number;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  clientId: string;
+  clientName: string;
+  clientPhone: string;
+  items: OrderItem[];
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+  acompte: number;
+  restant: number;
+  currency: string;
+  status: OrderStatus;
+  paymentMethod?: PaymentMethod;
+  paymentProofUrl?: string;
+  deliveryAddress: string;
+  deliveryZone: string;
+  internalNotes: string;
+  createdAt: string;
+  updatedAt: string;
+  confirmedAt?: string;
+  deliveredAt?: string;
+}
+
+/* ─── Clients ─── */
+export interface Client {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  address?: string;
+  city: string;
+  country: string;
+  totalOrders: number;
+  totalSpent: number;
+  currency: string;
+  isVip: boolean;
+  notes: string;
+  createdAt: string;
+  lastOrderAt?: string;
+}
+
+/* ─── Collections ─── */
+export interface Collection {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+  productIds: string[];
+  isActive: boolean;
+  isFeaturedOnHome: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/* ─── Settings ─── */
+export interface DeliveryZone {
+  name: string;
+  fee: number;
+  estimatedDays: string;
+}
+
+export interface PaymentMethodConfig {
+  id: PaymentMethod;
+  label: string;
+  isActive: boolean;
+  instructions?: string;
+}
+
+export interface SiteSettings {
+  whatsappNumber: string;
+  currency: string;
+  currencySymbol: string;
+  countries: string[];
+  deliveryZones: DeliveryZone[];
+  paymentMethods: PaymentMethodConfig[];
+  orderPrefix: string;
+  lowStockThreshold: number;
+  storeOpen: boolean;
+  maintenanceMessage?: string;
+}
+
+/* ─── Analytics ─── */
+export interface DailySales {
+  date: string;
+  revenue: number;
+  orderCount: number;
+}
+
 export const CATEGORIES: CategoryInfo[] = [
   { slug: 'femme', name: 'Femme', description: 'Mode féminine tendance', image: 'https://img.baba-blog.com/2024/06/the-womens-clothing6.jpg?x-oss-process=style%2Ffull' },
   { slug: 'homme', name: 'Homme', description: 'Style masculin moderne', image: 'https://img.baba-blog.com/2024/02/boomber-jacket.jpeg?x-oss-process=style%2Ffull' },
