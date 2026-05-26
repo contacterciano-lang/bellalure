@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/lib/ThemeProvider";
+import { CurrencyProvider } from "@/lib/currency";
+import { CartProvider } from "@/lib/cart";
+import { WishlistProvider } from "@/lib/wishlist";
 import StorefrontShell from "@/components/layout/StorefrontShell";
 
 const inter = Inter({
@@ -50,7 +53,13 @@ export default function RootLayout({
     >
       <body className="min-h-screen flex flex-col">
         <ThemeProvider>
-          <StorefrontShell>{children}</StorefrontShell>
+          <CurrencyProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <StorefrontShell>{children}</StorefrontShell>
+              </WishlistProvider>
+            </CartProvider>
+          </CurrencyProvider>
         </ThemeProvider>
       </body>
     </html>

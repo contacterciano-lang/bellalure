@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import MobileNav from '@/components/layout/MobileNav';
 import WhatsAppFloat from '@/components/ui/WhatsAppFloat';
+import CartDrawer from '@/components/ui/CartDrawer';
 
 export default function StorefrontShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -21,6 +22,7 @@ export default function StorefrontShell({ children }: { children: React.ReactNod
       <Footer />
       <MobileNav />
       <WhatsAppFloat />
+      <CartDrawer />
     </>
   );
 }
