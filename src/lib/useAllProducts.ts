@@ -15,11 +15,10 @@ export function useAllProducts(): Product[] {
       })
       .then((dynamic: Product[]) => {
         if (Array.isArray(dynamic) && dynamic.length > 0) {
-          const staticIds = new Set(staticProducts.map((p) => p.id));
-          const newProducts = dynamic.filter((p) => !staticIds.has(p.id));
-          if (newProducts.length > 0) {
-            setAllProducts([...staticProducts, ...newProducts]);
-          }
+          // Supabase versions override static products (for edited products)
+          const dynamicIds = new Set(dynamic.map((p) => p.id));
+          const remainingStatic = staticProducts.filter((p) => !dynamicIds.has(p.id));
+          setAllProducts([...remainingStatic, ...dynamic]);
         }
       })
       .catch(() => {});

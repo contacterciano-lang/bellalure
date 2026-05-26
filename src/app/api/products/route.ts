@@ -102,6 +102,56 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export async function PATCH(request: NextRequest) {
+  try {
+    const { id, ...updates } = await request.json();
+
+    if (!id) {
+      return Response.json({ error: 'ID requis' }, { status: 400 });
+    }
+
+    const dbUpdates: Record<string, unknown> = {};
+    if (updates.name !== undefined) dbUpdates.name = updates.name;
+    if (updates.slug !== undefined) dbUpdates.slug = updates.slug;
+    if (updates.category !== undefined) dbUpdates.category = updates.category;
+    if (updates.price !== undefined) dbUpdates.price = updates.price;
+    if (updates.originalPrice !== undefined) dbUpdates.original_price = updates.originalPrice || null;
+    if (updates.currency !== undefined) dbUpdates.currency = updates.currency;
+    if (updates.description !== undefined) dbUpdates.description = updates.description;
+    if (updates.images !== undefined) dbUpdates.images = updates.images;
+    if (updates.sizes !== undefined) dbUpdates.sizes = updates.sizes;
+    if (updates.badge !== undefined) dbUpdates.badge = updates.badge || null;
+    if (updates.stock !== undefined) dbUpdates.stock = updates.stock;
+    if (updates.rating !== undefined) dbUpdates.rating = updates.rating;
+    if (updates.reviews !== undefined) dbUpdates.reviews = updates.reviews;
+    if (updates.newArrival !== undefined) dbUpdates.new_arrival = updates.newArrival;
+
+    if (Object.keys(dbUpdates).length === 0) {
+      return Response.json({ error: 'Aucune modification fournie' }, { status: 400 });
+    }
+
+    const { data, error } = await getSupabase()
+      .from('products')
+      .update(dbUpdates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      return Response.json({ error: error.message }, { status: 500 });
+    }
+
+    if (!data) {
+      return Response.json({ error: 'Produit non trouvé' }, { status: 404 });
+    }
+
+    return Response.json({ success: true, product: rowToProduct(data) });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Erreur inconnue';
+    return Response.json({ error: message }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   try {
     const { id } = await request.json();
