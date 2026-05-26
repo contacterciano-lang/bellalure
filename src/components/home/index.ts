@@ -1,0 +1,11 @@
+export { default as HeroSection } from './HeroSection';
+export { default as NewArrivals } from './NewArrivals';
+export { default as TrendingSection } from './TrendingSection';
+export { default as CategoriesGrid } from './CategoriesGrid';
+export { default as FeaturedProducts } from './FeaturedProducts';
+export { default as PromoCountdown } from './PromoCountdown';
+export { default as TestimonialsSection } from './TestimonialsSection';
+export { default as WhatsAppBanner } from './WhatsAppBanner';
+export { default as DeliverySection } from './DeliverySection';
+export { default as LookbookSection } from './LookbookSection';
+export { default as ProductCard } from './ProductCard';
