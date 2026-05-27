@@ -2,25 +2,19 @@
 
 import type { WhatsAppOrder, WhatsAppOrderAction, OrderStatus, Product } from '@/lib/types';
 
-const STORAGE_KEY = 'bellalure-whatsapp-orders';
+/**
+ * WhatsApp orders are stored server-side in Supabase (table `whatsapp_orders`)
+ * so the admin sees every client's click on ANY device — not just the browser
+ * where it happened. Requires migration 002.
+ */
 
-export function getWhatsAppOrders(): WhatsAppOrder[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
+const WHATSAPP_NUMBER = '+33758167830';
 
-export function saveWhatsAppOrders(orders: WhatsAppOrder[]): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
-  } catch { /* ignore */ }
-}
-
+/**
+ * Fire-and-forget creation. Called from client click handlers right before the
+ * WhatsApp link opens, so it must not block navigation: we POST in the
+ * background and ignore failures.
+ */
 export function createWhatsAppOrder(
   product: Product,
   action: WhatsAppOrderAction,
@@ -28,6 +22,7 @@ export function createWhatsAppOrder(
   size?: string,
   color?: string,
 ): WhatsAppOrder {
+  const now = new Date().toISOString();
   const order: WhatsAppOrder = {
     id: `wa-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     productId: product.id,
@@ -37,32 +32,65 @@ export function createWhatsAppOrder(
     price: product.price,
     showPrice: product.showPrice !== false,
     action,
-    whatsappNumber: '+33758167830',
+    whatsappNumber: WHATSAPP_NUMBER,
     quantity,
     size,
     color,
     status: 'nouveau',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: now,
+    updatedAt: now,
   };
 
-  const orders = getWhatsAppOrders();
-  orders.unshift(order);
-  saveWhatsAppOrders(orders);
+  try {
+    void fetch('/api/whatsapp-orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(order),
+      keepalive: true, // let it complete even if the page navigates to WhatsApp
+    }).catch(() => {});
+  } catch {
+    /* ignore */
+  }
+
   return order;
 }
 
-export function updateOrderStatus(orderId: string, status: OrderStatus): void {
-  const orders = getWhatsAppOrders();
-  const idx = orders.findIndex((o) => o.id === orderId);
-  if (idx !== -1) {
-    orders[idx].status = status;
-    orders[idx].updatedAt = new Date().toISOString();
-    saveWhatsAppOrders(orders);
+/** Loads all WhatsApp orders from the server (newest first). */
+export async function fetchWhatsAppOrders(): Promise<WhatsAppOrder[]> {
+  try {
+    const res = await fetch('/api/whatsapp-orders', { cache: 'no-store' });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
   }
 }
 
-export function deleteWhatsAppOrder(orderId: string): void {
-  const orders = getWhatsAppOrders();
-  saveWhatsAppOrders(orders.filter((o) => o.id !== orderId));
+/** Updates a single order's status on the server. */
+export async function updateOrderStatus(orderId: string, status: OrderStatus): Promise<boolean> {
+  try {
+    const res = await fetch('/api/whatsapp-orders', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: orderId, status }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Deletes a single order on the server. */
+export async function deleteWhatsAppOrder(orderId: string): Promise<boolean> {
+  try {
+    const res = await fetch('/api/whatsapp-orders', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: orderId }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
 }

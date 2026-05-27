@@ -987,6 +987,16 @@ export default function ParametresPage() {
     (updated: SiteSettings) => {
       setSettings(updated);
       setItem('bellalure-settings', updated);
+      // Persist the global price visibility server-side so it applies to all
+      // visitors (not just this browser).
+      void fetch('/api/config', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          key: 'show_prices_global',
+          value: updated.showPrices !== false,
+        }),
+      }).catch(() => {});
       showToast('Parametres sauvegardes avec succes');
     },
     [showToast],

@@ -9,14 +9,24 @@ export function usePriceVisibility() {
   const [globalShowPrice, setGlobalShowPrice] = useState(true);
 
   useEffect(() => {
+    // 1. Instant value from localStorage (admin's own browser) to avoid flicker
     try {
       const raw = localStorage.getItem(SETTINGS_KEY);
       if (raw) {
         const settings: SiteSettings = JSON.parse(raw);
-        // showPrices defaults to true when undefined
         setGlobalShowPrice(settings.showPrices !== false);
       }
     } catch { /* ignore */ }
+
+    // 2. Authoritative value from the server (shared across all visitors)
+    fetch('/api/config', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((config: Record<string, unknown> | null) => {
+        if (config && 'show_prices_global' in config) {
+          setGlobalShowPrice(config.show_prices_global !== false);
+        }
+      })
+      .catch(() => { /* keep local value */ });
 
     const handleStorage = (e: StorageEvent) => {
       if (e.key === SETTINGS_KEY && e.newValue) {

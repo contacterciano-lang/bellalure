@@ -26,6 +26,7 @@ import {
   Eye,
   Hash,
   MessageCircle,
+  RefreshCw,
 } from 'lucide-react';
 import { products as staticProducts } from '@/data/products';
 import type { Order, OrderItem, OrderStatus, PaymentMethod, Product, Client, WhatsAppOrder } from '@/lib/types';
@@ -37,7 +38,7 @@ import {
 } from '@/lib/admin/constants';
 import { getItem, setItem, STORAGE_KEYS } from '@/lib/admin/localStorage';
 import { DEFAULT_SETTINGS } from '@/lib/admin/constants';
-import { getWhatsAppOrders, updateOrderStatus as updateWAStatus, deleteWhatsAppOrder } from '@/lib/whatsappOrders';
+import { fetchWhatsAppOrders, updateOrderStatus as updateWAStatus, deleteWhatsAppOrder } from '@/lib/whatsappOrders';
 
 /* ─── Types ─── */
 
@@ -342,7 +343,7 @@ export default function OrdersPage() {
   useEffect(() => {
     setOrders(getItem<Order[]>(STORAGE_KEYS.ORDERS, []));
     setClients(getItem<Client[]>(STORAGE_KEYS.CLIENTS, []));
-    setWaOrders(getWhatsAppOrders());
+    fetchWhatsAppOrders().then(setWaOrders);
   }, []);
 
   // Merge static + dynamic products
@@ -674,20 +675,33 @@ export default function OrdersPage() {
   }, [waOrders]);
 
   const handleWAStatusChange = useCallback(
-    (orderId: string, newStatus: OrderStatus) => {
-      updateWAStatus(orderId, newStatus);
-      setWaOrders(getWhatsAppOrders());
+    async (orderId: string, newStatus: OrderStatus) => {
+      // Optimistic UI update, then persist server-side
+      setWaOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)),
+      );
+      const ok = await updateWAStatus(orderId, newStatus);
       const label = ORDER_STATUSES.find((s) => s.value === newStatus)?.label || newStatus;
-      showToast(`Statut mis a jour: ${label}`);
+      if (ok) {
+        showToast(`Statut mis a jour: ${label}`);
+      } else {
+        showToast('Erreur de mise a jour du statut', 'error');
+        fetchWhatsAppOrders().then(setWaOrders);
+      }
     },
     [showToast],
   );
 
   const handleWADelete = useCallback(
-    (orderId: string) => {
-      deleteWhatsAppOrder(orderId);
-      setWaOrders(getWhatsAppOrders());
-      showToast('Commande WhatsApp supprimee');
+    async (orderId: string) => {
+      setWaOrders((prev) => prev.filter((o) => o.id !== orderId));
+      const ok = await deleteWhatsAppOrder(orderId);
+      if (ok) {
+        showToast('Commande WhatsApp supprimee');
+      } else {
+        showToast('Erreur de suppression', 'error');
+        fetchWhatsAppOrders().then(setWaOrders);
+      }
     },
     [showToast],
   );
@@ -806,14 +820,24 @@ export default function OrdersPage() {
             transition={{ delay: 0.05 }}
             className="mb-6 space-y-4"
           >
-            <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <input
-                value={waSearch}
-                onChange={(e) => setWaSearch(e.target.value)}
-                placeholder="Rechercher par produit ou categorie..."
-                className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black"
-              />
+            <div className="flex items-center gap-2">
+              <div className="relative max-w-md flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  value={waSearch}
+                  onChange={(e) => setWaSearch(e.target.value)}
+                  placeholder="Rechercher par produit ou categorie..."
+                  className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black"
+                />
+              </div>
+              <button
+                onClick={() => fetchWhatsAppOrders().then(setWaOrders)}
+                className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                title="Actualiser les commandes"
+              >
+                <RefreshCw className="h-4 w-4" />
+                <span className="hidden sm:inline">Actualiser</span>
+              </button>
             </div>
             <div className="flex gap-1 overflow-x-auto pb-1">
               {waTabs.map((tab) => (
