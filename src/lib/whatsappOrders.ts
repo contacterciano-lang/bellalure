@@ -3,9 +3,9 @@
 import type { WhatsAppOrder, WhatsAppOrderAction, OrderStatus, Product } from '@/lib/types';
 
 /**
- * WhatsApp orders are stored server-side in Supabase (table `whatsapp_orders`)
- * so the admin sees every client's click on ANY device — not just the browser
- * where it happened. Requires migration 002.
+ * Orders are stored server-side in Supabase (table `orders`) so the admin sees
+ * every client's click on ANY device — not just the browser where it happened.
+ * Requires migration 004 (table `orders` with auto-computed total/profit).
  */
 
 const WHATSAPP_NUMBER = '+33758167830';
@@ -24,12 +24,13 @@ export function createWhatsAppOrder(
 ): WhatsAppOrder {
   const now = new Date().toISOString();
   const order: WhatsAppOrder = {
-    id: `wa-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    id: `ord-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     productId: product.id,
     productName: product.name,
     productImage: product.images[0] || '',
     productCategory: product.category,
     price: product.price,
+    supplierPrice: product.supplierPrice ?? 0,
     showPrice: product.showPrice !== false,
     action,
     whatsappNumber: WHATSAPP_NUMBER,
@@ -37,12 +38,13 @@ export function createWhatsAppOrder(
     size,
     color,
     status: 'nouveau',
+    source: 'whatsapp',
     createdAt: now,
     updatedAt: now,
   };
 
   try {
-    void fetch('/api/whatsapp-orders', {
+    void fetch('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(order),
@@ -58,7 +60,7 @@ export function createWhatsAppOrder(
 /** Loads all WhatsApp orders from the server (newest first). */
 export async function fetchWhatsAppOrders(): Promise<WhatsAppOrder[]> {
   try {
-    const res = await fetch('/api/whatsapp-orders', { cache: 'no-store' });
+    const res = await fetch('/api/orders', { cache: 'no-store' });
     if (!res.ok) return [];
     const data = await res.json();
     return Array.isArray(data) ? data : [];
@@ -70,7 +72,7 @@ export async function fetchWhatsAppOrders(): Promise<WhatsAppOrder[]> {
 /** Updates a single order's status on the server. */
 export async function updateOrderStatus(orderId: string, status: OrderStatus): Promise<boolean> {
   try {
-    const res = await fetch('/api/whatsapp-orders', {
+    const res = await fetch('/api/orders', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: orderId, status }),
@@ -84,7 +86,7 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus): P
 /** Deletes a single order on the server. */
 export async function deleteWhatsAppOrder(orderId: string): Promise<boolean> {
   try {
-    const res = await fetch('/api/whatsapp-orders', {
+    const res = await fetch('/api/orders', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: orderId }),
@@ -98,7 +100,7 @@ export async function deleteWhatsAppOrder(orderId: string): Promise<boolean> {
 /** Saves the customer's phone number on an order (so they can be notified). */
 export async function updateOrderPhone(orderId: string, customerPhone: string): Promise<boolean> {
   try {
-    const res = await fetch('/api/whatsapp-orders', {
+    const res = await fetch('/api/orders', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: orderId, customerPhone }),

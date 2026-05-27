@@ -22,6 +22,9 @@ interface DbRow {
   new_arrival: boolean;
   source_url: string | null;
   show_price?: boolean | null;
+  supplier_price?: number | null;
+  status?: string | null;
+  colors?: unknown;
 }
 
 function rowToProduct(row: DbRow): Product {
@@ -43,6 +46,9 @@ function rowToProduct(row: DbRow): Product {
     newArrival: row.new_arrival,
     // Only `false` hides the price. null/undefined/true => visible.
     showPrice: row.show_price === false ? false : undefined,
+    supplierPrice: row.supplier_price != null ? Number(row.supplier_price) : undefined,
+    status: (row.status as Product['status']) || undefined,
+    colors: Array.isArray(row.colors) && row.colors.length > 0 ? (row.colors as Product['colors']) : undefined,
   };
 }
 
@@ -60,7 +66,7 @@ function missingColumn(error: PgError | null): string | null {
   const msg = (error.message || '').toLowerCase();
   // PostgREST schema-cache miss or Postgres undefined-column error
   if (error.code === 'PGRST204' || error.code === '42703' || msg.includes('does not exist') || msg.includes('could not find')) {
-    const known = ['show_price'];
+    const known = ['supplier_price', 'show_price', 'status', 'colors'];
     for (const col of known) {
       if (msg.includes(col)) return col;
     }
@@ -141,6 +147,9 @@ export async function POST(request: NextRequest) {
       source_url: product.sourceUrl || null,
       // false = price hidden; everything else defaults to visible
       show_price: product.showPrice === false ? false : true,
+      supplier_price: product.supplierPrice ?? 0,
+      status: product.status || 'active',
+      colors: product.colors ?? [],
     });
 
     if (error) {
@@ -181,6 +190,8 @@ export async function PATCH(request: NextRequest) {
     if (updates.reviews !== undefined) dbUpdates.reviews = updates.reviews;
     if (updates.newArrival !== undefined) dbUpdates.new_arrival = updates.newArrival;
     if (updates.showPrice !== undefined) dbUpdates.show_price = updates.showPrice === false ? false : true;
+    if (updates.supplierPrice !== undefined) dbUpdates.supplier_price = updates.supplierPrice ?? 0;
+    if (updates.status !== undefined) dbUpdates.status = updates.status || 'active';
 
     if (Object.keys(dbUpdates).length === 0) {
       return Response.json({ error: 'Aucune modification fournie' }, { status: 400 });

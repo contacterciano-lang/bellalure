@@ -39,7 +39,11 @@ export interface Product {
   trending?: boolean;
   newArrival?: boolean;
   showPrice?: boolean;
+  supplierPrice?: number;
+  status?: ProductStatus;
 }
+
+export type ProductStatus = 'active' | 'draft' | 'archived';
 
 export interface CategoryInfo {
   slug: Category;
@@ -186,7 +190,15 @@ export interface WhatsAppOrder {
   size?: string;
   color?: string;
   status: OrderStatus;
+  customerName?: string;
   customerPhone?: string;
+  // price = prix de vente unitaire ; supplierPrice = prix fournisseur unitaire.
+  // totalAmount / supplierTotal / profit sont calculés par la base (lecture seule).
+  supplierPrice?: number;
+  totalAmount?: number;
+  supplierTotal?: number;
+  profit?: number;
+  source?: string;
   createdAt: string;
   updatedAt: string;
 }
