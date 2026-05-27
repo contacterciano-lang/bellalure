@@ -44,6 +44,18 @@ function rowToOrder(r: DbRow): WhatsAppOrder {
   };
 }
 
+interface PgError { message?: string; code?: string; }
+
+/** True when the error is "customer_phone column missing" (migration 003 not run yet). */
+function missingCustomerPhone(error: PgError | null): boolean {
+  if (!error) return false;
+  const msg = (error.message || '').toLowerCase();
+  const isMissing =
+    error.code === 'PGRST204' || error.code === '42703' ||
+    msg.includes('does not exist') || msg.includes('could not find');
+  return isMissing && msg.includes('customer_phone');
+}
+
 export async function GET() {
   try {
     const { data, error } = await getSupabase()
@@ -70,7 +82,7 @@ export async function POST(request: NextRequest) {
     }
 
     const now = new Date().toISOString();
-    const { error } = await getSupabase().from('whatsapp_orders').insert({
+    const row: Record<string, unknown> = {
       id: o.id || `wa-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       product_id: o.productId || null,
       product_name: o.productName,
@@ -87,7 +99,13 @@ export async function POST(request: NextRequest) {
       customer_phone: o.customerPhone || null,
       created_at: o.createdAt || now,
       updated_at: now,
-    });
+    };
+
+    let { error } = await getSupabase().from('whatsapp_orders').insert(row);
+    if (missingCustomerPhone(error)) {
+      delete row.customer_phone;
+      ({ error } = await getSupabase().from('whatsapp_orders').insert(row));
+    }
 
     if (error) {
       return Response.json({ error: error.message }, { status: 500 });
@@ -110,10 +128,11 @@ export async function PATCH(request: NextRequest) {
     if (status !== undefined) updates.status = status;
     if (customerPhone !== undefined) updates.customer_phone = customerPhone || null;
 
-    const { error } = await getSupabase()
-      .from('whatsapp_orders')
-      .update(updates)
-      .eq('id', id);
+    let { error } = await getSupabase().from('whatsapp_orders').update(updates).eq('id', id);
+    if (missingCustomerPhone(error)) {
+      delete updates.customer_phone;
+      ({ error } = await getSupabase().from('whatsapp_orders').update(updates).eq('id', id));
+    }
 
     if (error) {
       return Response.json({ error: error.message }, { status: 500 });
