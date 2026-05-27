@@ -828,7 +828,7 @@ export default function ProductsPage() {
         newArrival: formData.newArrival,
         featured: formData.featured,
         trending: formData.trending,
-        showPrice: formData.showPrice === false ? false : undefined,
+        showPrice: formData.showPrice,
       };
 
       const res = await fetch('/api/products', {
@@ -859,8 +859,11 @@ export default function ProductsPage() {
     try {
       const isStatic = !dynamicIds.has(editingProduct.id);
 
+      // For static products we insert a Supabase row that REUSES the original id,
+      // so the storefront merge (which dedupes by id) overrides the static product
+      // instead of creating a duplicate.
       const payload: Record<string, unknown> = {
-        id: isStatic ? `prod-${Date.now()}` : editingProduct.id,
+        id: editingProduct.id,
         name: formData.name,
         slug: slugify(formData.name),
         category: formData.category,
@@ -875,7 +878,7 @@ export default function ProductsPage() {
         rating: formData.rating,
         reviews: formData.reviews,
         newArrival: formData.newArrival,
-        showPrice: formData.showPrice === false ? false : undefined,
+        showPrice: formData.showPrice,
       };
 
       const method = isStatic ? 'POST' : 'PATCH';

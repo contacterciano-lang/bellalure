@@ -98,7 +98,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="absolute inset-x-3 bottom-3 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
           {priceHidden ? (
             <a
-              href={`https://wa.me/33758167830?text=${encodeURIComponent(`Bonjour Bellalure, je suis intéressé(e) par : ${product.name}. Quel est le prix ?`)}`}
+              href={`https://wa.me/33758167830?text=${encodeURIComponent(`Bonjour Bellalure, je souhaite connaître le prix de ce produit : ${product.name}`)}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => {
@@ -131,7 +131,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </Link>
         {priceHidden ? (
           <a
-            href={`https://wa.me/33758167830?text=${encodeURIComponent(`Bonjour Bellalure, je voudrais connaître le prix de : ${product.name}`)}`}
+            href={`https://wa.me/33758167830?text=${encodeURIComponent(`Bonjour Bellalure, je souhaite connaître le prix de ce produit : ${product.name}`)}`}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => {

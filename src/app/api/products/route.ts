@@ -21,6 +21,7 @@ interface DbRow {
   reviews: number;
   new_arrival: boolean;
   source_url: string | null;
+  show_price?: boolean | null;
 }
 
 function rowToProduct(row: DbRow): Product {
@@ -40,7 +41,63 @@ function rowToProduct(row: DbRow): Product {
     rating: Number(row.rating),
     reviews: row.reviews,
     newArrival: row.new_arrival,
+    // Only `false` hides the price. null/undefined/true => visible.
+    showPrice: row.show_price === false ? false : undefined,
   };
+}
+
+interface PgError {
+  message?: string;
+  code?: string;
+}
+
+/**
+ * Detects a "column does not exist" error and returns the offending column name.
+ * Lets the API keep working before the optional `show_price` column is added.
+ */
+function missingColumn(error: PgError | null): string | null {
+  if (!error) return null;
+  const msg = (error.message || '').toLowerCase();
+  // PostgREST schema-cache miss or Postgres undefined-column error
+  if (error.code === 'PGRST204' || error.code === '42703' || msg.includes('does not exist') || msg.includes('could not find')) {
+    const known = ['show_price'];
+    for (const col of known) {
+      if (msg.includes(col)) return col;
+    }
+  }
+  return null;
+}
+
+type Row = Record<string, unknown>;
+
+/** Insert a row, retrying without optional columns the DB doesn't have yet. */
+async function resilientInsert(row: Row) {
+  let payload = { ...row };
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const res = await getSupabase().from('products').insert(payload).select().single();
+    const missing = missingColumn(res.error);
+    if (missing && missing in payload) {
+      delete payload[missing];
+      continue;
+    }
+    return res;
+  }
+  return getSupabase().from('products').insert(payload).select().single();
+}
+
+/** Update a row, retrying without optional columns the DB doesn't have yet. */
+async function resilientUpdate(id: string, row: Row) {
+  let payload = { ...row };
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const res = await getSupabase().from('products').update(payload).eq('id', id).select().single();
+    const missing = missingColumn(res.error);
+    if (missing && missing in payload) {
+      delete payload[missing];
+      continue;
+    }
+    return res;
+  }
+  return getSupabase().from('products').update(payload).eq('id', id).select().single();
 }
 
 export async function GET() {
@@ -65,28 +122,26 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'Champs requis manquants (name, slug, category)' }, { status: 400 });
     }
 
-    const { data, error } = await getSupabase()
-      .from('products')
-      .insert({
-        id: product.id,
-        name: product.name,
-        slug: product.slug,
-        category: product.category,
-        price: product.price,
-        original_price: product.originalPrice || null,
-        currency: product.currency || 'USD',
-        description: product.description || '',
-        images: product.images || [],
-        sizes: product.sizes || [],
-        badge: product.badge || null,
-        stock: product.stock ?? 10,
-        rating: product.rating ?? 4.5,
-        reviews: product.reviews ?? 0,
-        new_arrival: product.newArrival ?? true,
-        source_url: product.sourceUrl || null,
-      })
-      .select()
-      .single();
+    const { data, error } = await resilientInsert({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      category: product.category,
+      price: product.price,
+      original_price: product.originalPrice || null,
+      currency: product.currency || 'USD',
+      description: product.description || '',
+      images: product.images || [],
+      sizes: product.sizes || [],
+      badge: product.badge || null,
+      stock: product.stock ?? 10,
+      rating: product.rating ?? 4.5,
+      reviews: product.reviews ?? 0,
+      new_arrival: product.newArrival ?? true,
+      source_url: product.sourceUrl || null,
+      // false = price hidden; everything else defaults to visible
+      show_price: product.showPrice === false ? false : true,
+    });
 
     if (error) {
       if (error.code === '23505') {
@@ -125,17 +180,13 @@ export async function PATCH(request: NextRequest) {
     if (updates.rating !== undefined) dbUpdates.rating = updates.rating;
     if (updates.reviews !== undefined) dbUpdates.reviews = updates.reviews;
     if (updates.newArrival !== undefined) dbUpdates.new_arrival = updates.newArrival;
+    if (updates.showPrice !== undefined) dbUpdates.show_price = updates.showPrice === false ? false : true;
 
     if (Object.keys(dbUpdates).length === 0) {
       return Response.json({ error: 'Aucune modification fournie' }, { status: 400 });
     }
 
-    const { data, error } = await getSupabase()
-      .from('products')
-      .update(dbUpdates)
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await resilientUpdate(id, dbUpdates);
 
     if (error) {
       return Response.json({ error: error.message }, { status: 500 });
