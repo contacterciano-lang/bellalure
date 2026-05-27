@@ -186,6 +186,7 @@ export interface WhatsAppOrder {
   size?: string;
   color?: string;
   status: OrderStatus;
+  customerPhone?: string;
   createdAt: string;
   updatedAt: string;
 }

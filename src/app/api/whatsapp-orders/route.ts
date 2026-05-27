@@ -18,6 +18,7 @@ interface DbRow {
   size: string | null;
   color: string | null;
   status: string;
+  customer_phone: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -37,6 +38,7 @@ function rowToOrder(r: DbRow): WhatsAppOrder {
     size: r.size || undefined,
     color: r.color || undefined,
     status: (r.status as OrderStatus) || 'nouveau',
+    customerPhone: r.customer_phone || undefined,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };
@@ -82,6 +84,7 @@ export async function POST(request: NextRequest) {
       size: o.size || null,
       color: o.color || null,
       status: o.status || 'nouveau',
+      customer_phone: o.customerPhone || null,
       created_at: o.createdAt || now,
       updated_at: now,
     });
@@ -98,14 +101,18 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const { id, status } = await request.json();
-    if (!id || !status) {
-      return Response.json({ error: 'id et status requis' }, { status: 400 });
+    const { id, status, customerPhone } = await request.json();
+    if (!id) {
+      return Response.json({ error: 'id requis' }, { status: 400 });
     }
+
+    const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    if (status !== undefined) updates.status = status;
+    if (customerPhone !== undefined) updates.customer_phone = customerPhone || null;
 
     const { error } = await getSupabase()
       .from('whatsapp_orders')
-      .update({ status, updated_at: new Date().toISOString() })
+      .update(updates)
       .eq('id', id);
 
     if (error) {

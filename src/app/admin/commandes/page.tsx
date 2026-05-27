@@ -38,7 +38,7 @@ import {
 } from '@/lib/admin/constants';
 import { getItem, setItem, STORAGE_KEYS } from '@/lib/admin/localStorage';
 import { DEFAULT_SETTINGS } from '@/lib/admin/constants';
-import { fetchWhatsAppOrders, updateOrderStatus as updateWAStatus, deleteWhatsAppOrder } from '@/lib/whatsappOrders';
+import { fetchWhatsAppOrders, updateOrderStatus as updateWAStatus, deleteWhatsAppOrder, updateOrderPhone, buildNotifyUrl } from '@/lib/whatsappOrders';
 
 /* ─── Types ─── */
 
@@ -683,13 +683,34 @@ export default function OrdersPage() {
       const ok = await updateWAStatus(orderId, newStatus);
       const label = ORDER_STATUSES.find((s) => s.value === newStatus)?.label || newStatus;
       if (ok) {
-        showToast(`Statut mis a jour: ${label}`);
+        const order = waOrders.find((o) => o.id === orderId);
+        if (order?.customerPhone) {
+          showToast(`Statut: ${label} — cliquez "Notifier" pour prevenir le client`);
+        } else {
+          showToast(`Statut mis a jour: ${label}`);
+        }
       } else {
         showToast('Erreur de mise a jour du statut', 'error');
         fetchWhatsAppOrders().then(setWaOrders);
       }
     },
-    [showToast],
+    [showToast, waOrders],
+  );
+
+  const handleWAPhoneSave = useCallback(
+    async (orderId: string, phone: string) => {
+      const current = waOrders.find((o) => o.id === orderId);
+      if (current && (current.customerPhone || '') === phone) return; // unchanged
+      setWaOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, customerPhone: phone } : o)),
+      );
+      const ok = await updateOrderPhone(orderId, phone);
+      if (!ok) {
+        showToast('Erreur enregistrement du numero', 'error');
+        fetchWhatsAppOrders().then(setWaOrders);
+      }
+    },
+    [showToast, waOrders],
   );
 
   const handleWADelete = useCallback(
@@ -907,6 +928,9 @@ export default function OrdersPage() {
                       <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
                         Statut
                       </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                        N&deg; Client
+                      </th>
                       <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                         Actions
                       </th>
@@ -1004,18 +1028,40 @@ export default function OrdersPage() {
                           />
                         </td>
 
+                        {/* Customer phone */}
+                        <td className="px-4 py-3">
+                          <input
+                            type="tel"
+                            defaultValue={wo.customerPhone || ''}
+                            onBlur={(e) => handleWAPhoneSave(wo.id, e.target.value.trim())}
+                            placeholder="+243..."
+                            className="w-32 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-900 outline-none placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black"
+                          />
+                        </td>
+
                         {/* Actions */}
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center justify-end gap-1">
-                            <a
-                              href={`https://wa.me/${wo.whatsappNumber.replace(/[^0-9]/g, '')}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="rounded-lg p-2 text-emerald-500 hover:bg-emerald-50 hover:text-emerald-700"
-                              title="Ouvrir WhatsApp"
-                            >
-                              <MessageCircle className="h-4 w-4" />
-                            </a>
+                            {buildNotifyUrl(wo) ? (
+                              <a
+                                href={buildNotifyUrl(wo)!}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 rounded-lg bg-[#25D366] px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-[#20BD5B]"
+                                title="Envoyer la mise a jour de statut au client sur WhatsApp"
+                              >
+                                <MessageCircle className="h-3.5 w-3.5" />
+                                Notifier
+                              </a>
+                            ) : (
+                              <span
+                                className="flex items-center gap-1 rounded-lg bg-gray-100 px-2.5 py-1.5 text-xs font-medium text-gray-400"
+                                title="Ajoutez le numero du client pour pouvoir le notifier"
+                              >
+                                <MessageCircle className="h-3.5 w-3.5" />
+                                Notifier
+                              </span>
+                            )}
                             <button
                               onClick={() => handleWADelete(wo.id)}
                               className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-600"
