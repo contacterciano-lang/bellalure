@@ -5,15 +5,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
 import { ShoppingBag } from 'lucide-react';
-import { products } from '@/data/products';
 import { getWhatsAppUrl } from '@/lib/config';
+import { useAllProducts } from '@/lib/useAllProducts';
 
 export default function FeaturedProducts() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
+  const products = useAllProducts();
 
   const featuredProducts = products
-    .filter((p) => p.featured === true)
+    .filter((p) => p.featured === true || p.badge === 'best-seller')
     .slice(0, 8);
 
   if (featuredProducts.length === 0) return null;

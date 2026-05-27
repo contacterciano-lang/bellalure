@@ -812,14 +812,22 @@ function CataloguePage() {
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
-    // Search filter
+    // Search filter — nom, description, catégorie, badge, couleurs, tailles
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
-      result = result.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q)
-      );
+      result = result.filter((p) => {
+        const haystack = [
+          p.name,
+          p.description,
+          p.category,
+          p.badge || '',
+          ...(p.colors?.map((c) => c.name) || []),
+          ...(p.sizes || []),
+        ]
+          .join(' ')
+          .toLowerCase();
+        return haystack.includes(q);
+      });
     }
 
     // Category filter

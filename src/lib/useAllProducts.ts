@@ -14,11 +14,11 @@ export function useAllProducts(): Product[] {
         return res.json();
       })
       .then((dynamic: Product[]) => {
+        // Supabase is the single source of truth (all products are seeded there).
+        // We replace — never merge — so deleted products do NOT reappear.
+        // Static array is only a fallback if the API is unreachable / empty.
         if (Array.isArray(dynamic) && dynamic.length > 0) {
-          // Supabase versions override static products (for edited products)
-          const dynamicIds = new Set(dynamic.map((p) => p.id));
-          const remainingStatic = staticProducts.filter((p) => !dynamicIds.has(p.id));
-          setAllProducts([...remainingStatic, ...dynamic]);
+          setAllProducts(dynamic);
         }
       })
       .catch(() => {});

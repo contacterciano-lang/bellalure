@@ -786,11 +786,11 @@ export default function ProductsPage() {
     try {
       const res = await fetch('/api/products');
       const dynamic: Product[] = await res.json();
-      if (Array.isArray(dynamic)) {
-        const ids = new Set(dynamic.map((p) => p.id));
-        setDynamicIds(ids);
-        const remaining = staticProducts.filter((p) => !ids.has(p.id));
-        setAllProducts([...remaining, ...dynamic]);
+      if (Array.isArray(dynamic) && dynamic.length > 0) {
+        // Supabase = source de vérité (tous les produits y sont). On remplace,
+        // on ne fusionne plus avec le statique → la suppression est permanente.
+        setDynamicIds(new Set(dynamic.map((p) => p.id)));
+        setAllProducts(dynamic);
       }
     } catch {
       /* keep static */
@@ -966,18 +966,18 @@ export default function ProductsPage() {
     if (!deletingProduct) return;
     setLoading(true);
     try {
-      const isDynamic = dynamicIds.has(deletingProduct.id);
-      if (isDynamic) {
-        const res = await fetch('/api/products', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: deletingProduct.id }),
-        });
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.error || 'Erreur suppression');
-        }
+      // Tous les produits sont dans Supabase → suppression réelle et permanente.
+      const res = await fetch('/api/products', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: deletingProduct.id }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Erreur suppression');
       }
+      // Retrait immédiat de la liste (avant même le refetch)
+      setAllProducts((prev) => prev.filter((p) => p.id !== deletingProduct.id));
       showToast(`"${deletingProduct.name}" supprimé`);
       setDeletingProduct(null);
       fetchProducts();
@@ -1330,9 +1330,8 @@ export default function ProductsPage() {
               </p>
               <p className="mt-1 text-xs text-red-600">
                 &laquo;&nbsp;{deletingProduct?.name}&nbsp;&raquo; sera
-                {dynamicIds.has(deletingProduct?.id || '')
-                  ? ' définitivement supprimé de la base de données.'
-                  : ' masqué (produit statique — il réapparaîtra au rechargement).'}
+                définitivement supprimé de la base de données. Cette action est
+                irréversible et le produit disparaîtra du site immédiatement.
               </p>
             </div>
           </div>

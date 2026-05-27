@@ -15,11 +15,12 @@ const footerLinks = {
     { label: 'Promotions', href: '/catalogue?badge=promo' },
   ],
   categories: [
-    { label: 'Femme', href: '/catalogue?category=femme' },
-    { label: 'Homme', href: '/catalogue?category=homme' },
-    { label: 'Chaussures', href: '/catalogue?category=chaussures' },
-    { label: 'Accessoires', href: '/catalogue?category=accessoires' },
+    { label: 'Femmes', href: '/catalogue?category=femmes' },
+    { label: 'Hommes', href: '/catalogue?category=hommes' },
+    { label: 'Sneakers', href: '/catalogue?category=sneakers' },
     { label: 'Sacs', href: '/catalogue?category=sacs' },
+    { label: 'Montres', href: '/catalogue?category=montres' },
+    { label: 'Accessoires', href: '/catalogue?category=accessoires' },
   ],
   aide: [
     { label: 'Livraison', href: '/livraison' },

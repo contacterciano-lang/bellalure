@@ -4,15 +4,16 @@ import { useRef } from 'react';
 import Link from 'next/link';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
-import { products } from '@/data/products';
 import ProductCard from './ProductCard';
+import { useAllProducts } from '@/lib/useAllProducts';
 
 export default function NewArrivals() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
+  const products = useAllProducts();
 
-  const newProducts = products.filter((p) => p.newArrival === true);
+  const newProducts = products.filter((p) => p.newArrival === true).slice(0, 12);
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollRef.current) return;

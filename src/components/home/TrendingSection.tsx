@@ -5,13 +5,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight, Flame } from 'lucide-react';
-import { products } from '@/data/products';
+import { useAllProducts } from '@/lib/useAllProducts';
 
 export default function TrendingSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
+  const products = useAllProducts();
 
-  const trendingProducts = products.filter((p) => p.trending === true);
+  const trendingProducts = products.filter((p) => p.trending === true || p.badge === 'tendance').slice(0, 8);
 
   if (trendingProducts.length === 0) return null;
 
