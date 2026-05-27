@@ -7,75 +7,69 @@ import { motion } from 'framer-motion';
 import {
   DollarSign,
   ShoppingCart,
-  Package,
-  Users,
-  AlertTriangle,
   TrendingUp,
+  Wallet,
+  Clock,
+  Truck,
+  PackageCheck,
+  CreditCard,
   ArrowUpRight,
+  CalendarDays,
 } from 'lucide-react';
-import { products as staticProducts } from '@/data/products';
-import type { Product, Order, Client } from '@/lib/types';
-import { getItem } from '@/lib/admin/localStorage';
+import type { Product, WhatsAppOrder, OrderStatus } from '@/lib/types';
+import { fetchWhatsAppOrders } from '@/lib/whatsappOrders';
 import { ORDER_STATUSES, formatPrice } from '@/lib/admin/constants';
 
-/* ─── Helpers ─── */
+/* ─── CA logic ───
+   Commandes comptées dans le CA : acompte payé → livré.
+   Exclues : nouvelle commande, confirmé (pas encore payé), annulé. */
+const VALIDATED: OrderStatus[] = [
+  'acompte_paye',
+  'commande_fournisseur',
+  'en_transit',
+  'arrive_kinshasa',
+  'livre',
+];
+const SUPPLIER_STATUSES: OrderStatus[] = [
+  'acompte_paye',
+  'commande_fournisseur',
+  'en_transit',
+  'arrive_kinshasa',
+];
 
-function isToday(dateStr: string): boolean {
-  const d = new Date(dateStr);
-  const now = new Date();
-  return (
-    d.getFullYear() === now.getFullYear() &&
-    d.getMonth() === now.getMonth() &&
-    d.getDate() === now.getDate()
-  );
+function isToday(s: string): boolean {
+  const d = new Date(s);
+  const n = new Date();
+  return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate();
 }
-
-function getStatusStyle(status: string) {
-  const found = ORDER_STATUSES.find((s) => s.value === status);
-  return found || { label: status, color: 'text-gray-700', bg: 'bg-gray-50' };
+function isThisMonth(s: string): boolean {
+  const d = new Date(s);
+  const n = new Date();
+  return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth();
 }
-
-function getCategoryLabel(slug: string): string {
-  const map: Record<string, string> = {
-    femme: 'Femme',
-    homme: 'Homme',
-    chaussures: 'Chaussures',
-    accessoires: 'Accessoires',
-    sacs: 'Sacs',
-  };
-  return map[slug] || slug;
+function statusStyle(status: string) {
+  return ORDER_STATUSES.find((s) => s.value === status) || { label: status, color: 'text-gray-700', bg: 'bg-gray-50' };
 }
-
-/* ─── Stat Card ─── */
 
 function StatCard({
-  label,
-  value,
-  icon: Icon,
-  color,
-  index,
+  label, value, sub, icon: Icon, color, index,
 }: {
-  label: string;
-  value: string;
-  icon: React.ElementType;
-  color: string;
-  index: number;
+  label: string; value: string; sub?: string; icon: React.ElementType; color: string; index: number;
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.08 }}
+      transition={{ delay: index * 0.05 }}
       className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
     >
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex items-start justify-between">
+        <div className="min-w-0">
           <p className="text-sm text-gray-500">{label}</p>
           <p className="mt-1 text-2xl font-bold text-gray-900">{value}</p>
+          {sub && <p className="mt-0.5 text-xs text-gray-400">{sub}</p>}
         </div>
-        <div
-          className={`flex h-11 w-11 items-center justify-center rounded-xl ${color}`}
-        >
+        <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl ${color}`}>
           <Icon className="h-5 w-5 text-white" />
         </div>
       </div>
@@ -83,355 +77,167 @@ function StatCard({
   );
 }
 
-/* ─── Main Dashboard ─── */
-
 export default function AdminDashboardPage() {
-  const [allProducts, setAllProducts] = useState<Product[]>([...staticProducts]);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [clients, setClients] = useState<Client[]>([]);
+  const [orders, setOrders] = useState<WhatsAppOrder[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  /* Load dynamic products from API + merge with static */
   useEffect(() => {
-    fetch('/api/products')
-      .then((res) => res.json())
-      .then((dynamic: Product[]) => {
-        if (Array.isArray(dynamic) && dynamic.length > 0) {
-          const dynamicIds = new Set(dynamic.map((p) => p.id));
-          const remainingStatic = staticProducts.filter(
-            (p) => !dynamicIds.has(p.id),
-          );
-          setAllProducts([...remainingStatic, ...dynamic]);
-        }
-      })
-      .catch(() => {});
+    Promise.all([
+      fetchWhatsAppOrders(),
+      fetch('/api/products', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : [])).catch(() => []),
+    ]).then(([o, p]) => {
+      setOrders(Array.isArray(o) ? o : []);
+      setProducts(Array.isArray(p) ? p : []);
+      setLoading(false);
+    });
   }, []);
 
-  /* Load orders & clients from localStorage */
-  useEffect(() => {
-    setOrders(getItem<Order[]>('bellalure-orders', []));
-    setClients(getItem<Client[]>('bellalure-clients', []));
-  }, []);
+  const m = useMemo(() => {
+    const validated = orders.filter((o) => VALIDATED.includes(o.status));
+    const validatedToday = validated.filter((o) => isToday(o.createdAt));
+    const validatedMonth = validated.filter((o) => isThisMonth(o.createdAt));
+    const sum = (arr: WhatsAppOrder[], k: 'totalAmount' | 'profit') =>
+      arr.reduce((s, o) => s + (o[k] ?? 0), 0);
 
-  /* ─── Computed stats ─── */
+    const count = (st: OrderStatus | OrderStatus[]) => {
+      const set = Array.isArray(st) ? st : [st];
+      return orders.filter((o) => set.includes(o.status)).length;
+    };
 
-  const totalRevenue = useMemo(
-    () => orders.reduce((sum, o) => sum + o.total, 0),
-    [orders],
-  );
+    const caMonth = sum(validatedMonth, 'totalAmount');
+    const avgBasket = validatedMonth.length ? caMonth / validatedMonth.length : 0;
 
-  const ordersToday = useMemo(
-    () => orders.filter((o) => isToday(o.createdAt)),
-    [orders],
-  );
+    // Top produits par quantité commandée (toutes commandes hors annulées)
+    const byProduct = new Map<string, { name: string; image: string; qty: number; revenue: number }>();
+    for (const o of orders) {
+      if (o.status === 'annule') continue;
+      const key = o.productId || o.productName;
+      const cur = byProduct.get(key) || { name: o.productName, image: o.productImage, qty: 0, revenue: 0 };
+      cur.qty += o.quantity || 1;
+      if (VALIDATED.includes(o.status)) cur.revenue += o.totalAmount ?? 0;
+      byProduct.set(key, cur);
+    }
+    const topProducts = [...byProduct.values()].sort((a, b) => b.qty - a.qty).slice(0, 5);
 
-  const activeProducts = useMemo(
-    () => allProducts.filter((p) => p.stock > 0).length,
-    [allProducts],
-  );
+    const recent = [...orders]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 6);
 
-  /* Low-stock products (stock <= 5, excluding 0) */
-  const lowStockProducts = useMemo(
-    () =>
-      allProducts
-        .filter((p) => p.stock > 0 && p.stock <= 5)
-        .sort((a, b) => a.stock - b.stock),
-    [allProducts],
-  );
+    return {
+      caToday: sum(validatedToday, 'totalAmount'),
+      caMonth,
+      profitToday: sum(validatedToday, 'profit'),
+      profitMonth: sum(validatedMonth, 'profit'),
+      ordersToday: orders.filter((o) => isToday(o.createdAt)).length,
+      pending: count('nouveau'),
+      acompte: count('acompte_paye'),
+      supplier: count(SUPPLIER_STATUSES),
+      transit: count('en_transit'),
+      delivered: count('livre'),
+      avgBasket,
+      topProducts,
+      recent,
+      totalOrders: orders.length,
+    };
+  }, [orders]);
 
-  /* Top 5 products by reviews */
-  const popularProducts = useMemo(
-    () =>
-      [...allProducts]
-        .sort((a, b) => b.reviews - a.reviews)
-        .slice(0, 5),
-    [allProducts],
-  );
-
-  /* Recent 5 orders */
-  const recentOrders = useMemo(
-    () =>
-      [...orders]
-        .sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        )
-        .slice(0, 5),
-    [orders],
-  );
-
-  const stats = [
-    {
-      label: "Chiffre d'affaires",
-      value: formatPrice(totalRevenue),
-      icon: DollarSign,
-      color: 'bg-emerald-600',
-    },
-    {
-      label: 'Commandes du jour',
-      value: String(ordersToday.length),
-      icon: ShoppingCart,
-      color: 'bg-blue-600',
-    },
-    {
-      label: 'Produits actifs',
-      value: String(activeProducts),
-      icon: Package,
-      color: 'bg-purple-600',
-    },
-    {
-      label: 'Clients',
-      value: String(clients.length),
-      icon: Users,
-      color: 'bg-amber-500',
-    },
+  const cards = [
+    { label: "CA du jour", value: formatPrice(m.caToday), sub: `${m.ordersToday} commande(s) aujourd'hui`, icon: DollarSign, color: 'bg-emerald-600' },
+    { label: 'CA du mois', value: formatPrice(m.caMonth), sub: 'Commandes validées', icon: CalendarDays, color: 'bg-emerald-700' },
+    { label: 'Bénéfice du jour', value: formatPrice(m.profitToday), sub: `Mois : ${formatPrice(m.profitMonth)}`, icon: TrendingUp, color: 'bg-indigo-600' },
+    { label: 'Panier moyen', value: formatPrice(m.avgBasket), sub: 'Sur le mois', icon: Wallet, color: 'bg-purple-600' },
+    { label: 'En attente', value: String(m.pending), sub: 'Nouvelles commandes', icon: Clock, color: 'bg-blue-600' },
+    { label: 'Cmd. fournisseur', value: String(m.supplier), sub: 'Acompte → arrivé', icon: Truck, color: 'bg-orange-500' },
+    { label: 'En transit', value: String(m.transit), icon: PackageCheck, color: 'bg-yellow-500' },
+    { label: 'Livrées', value: String(m.delivered), icon: CreditCard, color: 'bg-teal-600' },
   ];
 
   return (
     <div className="mx-auto max-w-7xl p-6 lg:p-8">
-      {/* Page title */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Tableau de bord</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Vue d&apos;ensemble de votre boutique Bellalure
+          {loading ? 'Chargement…' : `Vue d'ensemble — ${m.totalOrders} commande(s) au total`}
         </p>
       </motion.div>
 
       {/* Stat cards */}
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {stats.map((stat, i) => (
-          <StatCard key={stat.label} {...stat} index={i} />
+        {cards.map((c, i) => (
+          <StatCard key={c.label} {...c} index={i} />
         ))}
       </div>
 
-      {/* Two-column grid: Low stock + Popular */}
-      <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* ─── Low Stock Alerts ─── */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Top produits */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-          className="rounded-xl border border-gray-200 bg-white shadow-sm"
-        >
-          <div className="flex items-center gap-2 border-b border-gray-100 px-5 py-4">
-            <AlertTriangle className="h-5 w-5 text-amber-500" />
-            <h2 className="text-sm font-semibold text-gray-900">
-              Alertes de stock
-            </h2>
-            {lowStockProducts.length > 0 && (
-              <span className="ml-auto inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
-                {lowStockProducts.length}
-              </span>
-            )}
-          </div>
-
-          <div className="divide-y divide-gray-50">
-            {lowStockProducts.length === 0 ? (
-              <div className="flex flex-col items-center py-10 text-center">
-                <Package className="mb-2 h-10 w-10 text-gray-200" />
-                <p className="text-sm text-gray-400">
-                  Tous les stocks sont suffisants
-                </p>
-              </div>
-            ) : (
-              lowStockProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="flex items-center gap-3 px-5 py-3"
-                >
-                  <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
-                    <Image
-                      src={product.images[0]}
-                      alt={product.name}
-                      fill
-                      className="object-cover"
-                      sizes="40px"
-                      unoptimized
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-gray-900">
-                      {product.name}
-                    </p>
-                  </div>
-                  <span
-                    className={`inline-flex min-w-[2rem] items-center justify-center rounded-full px-2.5 py-0.5 text-xs font-bold ${
-                      product.stock <= 2
-                        ? 'bg-red-100 text-red-700'
-                        : 'bg-amber-100 text-amber-700'
-                    }`}
-                  >
-                    {product.stock}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
-        </motion.div>
-
-        {/* ─── Popular Products ─── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
           className="rounded-xl border border-gray-200 bg-white shadow-sm"
         >
           <div className="flex items-center gap-2 border-b border-gray-100 px-5 py-4">
             <TrendingUp className="h-5 w-5 text-purple-500" />
-            <h2 className="text-sm font-semibold text-gray-900">
-              Produits populaires
-            </h2>
+            <h2 className="text-sm font-semibold text-gray-900">Produits les plus commandés</h2>
           </div>
-
           <div className="divide-y divide-gray-50">
-            {popularProducts.map((product, i) => (
-              <div
-                key={product.id}
-                className="flex items-center gap-3 px-5 py-3"
-              >
-                <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-[10px] font-bold text-gray-500">
-                  {i + 1}
-                </span>
+            {m.topProducts.length === 0 ? (
+              <div className="py-10 text-center text-sm text-gray-400">Aucune commande pour le moment</div>
+            ) : m.topProducts.map((p, i) => (
+              <div key={p.name + i} className="flex items-center gap-3 px-5 py-3">
+                <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-[10px] font-bold text-gray-500">{i + 1}</span>
                 <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
-                  <Image
-                    src={product.images[0]}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                    sizes="40px"
-                    unoptimized
-                  />
+                  {p.image && <Image src={p.image} alt={p.name} fill className="object-cover" sizes="40px" unoptimized />}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-gray-900">
-                    {product.name}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {getCategoryLabel(product.category)}
-                  </p>
+                  <p className="truncate text-sm font-medium text-gray-900">{p.name}</p>
+                  <p className="text-xs text-gray-400">{p.qty} commandé(s)</p>
                 </div>
-                <span className="text-xs font-medium text-gray-500">
-                  {product.reviews} avis
-                </span>
+                <span className="text-xs font-semibold text-gray-700">{formatPrice(p.revenue)}</span>
               </div>
             ))}
           </div>
         </motion.div>
+
+        {/* Recent orders */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+          className="rounded-xl border border-gray-200 bg-white shadow-sm"
+        >
+          <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+            <div className="flex items-center gap-2">
+              <ShoppingCart className="h-5 w-5 text-blue-500" />
+              <h2 className="text-sm font-semibold text-gray-900">Commandes récentes</h2>
+            </div>
+            <Link href="/admin/commandes" className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700">
+              Voir tout <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {m.recent.length === 0 ? (
+              <div className="py-10 text-center text-sm text-gray-400">Aucune commande</div>
+            ) : m.recent.map((o) => {
+              const s = statusStyle(o.status);
+              return (
+                <div key={o.id} className="flex items-center gap-3 px-5 py-3">
+                  <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                    {o.productImage && <Image src={o.productImage} alt={o.productName} fill className="object-cover" sizes="40px" unoptimized />}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-gray-900">{o.productName}</p>
+                    <p className="text-[11px] text-gray-400">
+                      {o.customerName || o.customerPhone || 'Client WhatsApp'} · {new Date(o.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-gray-900">{formatPrice(o.totalAmount ?? o.price)}</p>
+                    <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${s.bg} ${s.color}`}>{s.label}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
       </div>
-
-      {/* ─── Recent Orders ─── */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="rounded-xl border border-gray-200 bg-white shadow-sm"
-      >
-        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-          <div className="flex items-center gap-2">
-            <ShoppingCart className="h-5 w-5 text-blue-500" />
-            <h2 className="text-sm font-semibold text-gray-900">
-              Commandes r&eacute;centes
-            </h2>
-          </div>
-          {orders.length > 0 && (
-            <Link
-              href="/admin/commandes"
-              className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700"
-            >
-              Voir tout
-              <ArrowUpRight className="h-3.5 w-3.5" />
-            </Link>
-          )}
-        </div>
-
-        {recentOrders.length === 0 ? (
-          <div className="flex flex-col items-center py-14 text-center">
-            <ShoppingCart className="mb-3 h-12 w-12 text-gray-200" />
-            <p className="text-sm font-medium text-gray-500">
-              Aucune commande pour le moment
-            </p>
-            <p className="mt-1 text-xs text-gray-400">
-              Les commandes appara&icirc;tront ici d&egrave;s qu&apos;un
-              client passera une commande.
-            </p>
-            <Link
-              href="/admin/commandes"
-              className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-            >
-              <ShoppingCart className="h-4 w-4" />
-              Cr&eacute;er une commande
-            </Link>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px]">
-              <thead>
-                <tr className="border-b border-gray-100 bg-gray-50/50">
-                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    Commande
-                  </th>
-                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    Client
-                  </th>
-                  <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    Total
-                  </th>
-                  <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    Statut
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {recentOrders.map((order) => {
-                  const statusInfo = getStatusStyle(order.status);
-                  return (
-                    <tr
-                      key={order.id}
-                      className="transition-colors hover:bg-gray-50/50"
-                    >
-                      <td className="px-5 py-3">
-                        <p className="text-sm font-medium text-gray-900">
-                          {order.orderNumber}
-                        </p>
-                        <p className="text-[11px] text-gray-400">
-                          {new Date(order.createdAt).toLocaleDateString(
-                            'fr-FR',
-                            {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                            },
-                          )}
-                        </p>
-                      </td>
-                      <td className="px-5 py-3">
-                        <p className="text-sm text-gray-700">
-                          {order.clientName}
-                        </p>
-                      </td>
-                      <td className="px-5 py-3 text-right">
-                        <p className="text-sm font-semibold text-gray-900">
-                          {formatPrice(order.total, order.currency === 'USD' ? '$' : order.currency)}
-                        </p>
-                      </td>
-                      <td className="px-5 py-3 text-right">
-                        <span
-                          className={`inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${statusInfo.bg} ${statusInfo.color}`}
-                        >
-                          {statusInfo.label}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </motion.div>
     </div>
   );
 }
