@@ -1,11 +1,18 @@
 export type Badge = 'nouveau' | 'best-seller' | 'tendance' | 'promo';
 
 export type Category =
-  | 'femme'
-  | 'homme'
-  | 'chaussures'
+  | 'femmes'
+  | 'hommes'
+  | 'sneakers'
+  | 'sacs'
+  | 'montres'
   | 'accessoires'
-  | 'sacs';
+  | 'beaute'
+  | 'maison'
+  | 'electronique'
+  | 'tendances-tiktok'
+  | 'promotions'
+  | 'nouveautes';
 
 export interface ProductColor {
   name: string;
@@ -31,7 +38,7 @@ export interface Product {
   featured?: boolean;
   trending?: boolean;
   newArrival?: boolean;
-  hidePrice?: boolean;
+  showPrice?: boolean;
 }
 
 export interface CategoryInfo {
@@ -152,7 +159,7 @@ export interface SiteSettings {
   lowStockThreshold: number;
   storeOpen: boolean;
   maintenanceMessage?: string;
-  hidePrices?: boolean;
+  showPrices?: boolean;
 }
 
 /* ─── Analytics ─── */
@@ -162,10 +169,38 @@ export interface DailySales {
   orderCount: number;
 }
 
+/* ─── WhatsApp Orders ─── */
+export type WhatsAppOrderAction = 'commander' | 'demande_prix';
+
+export interface WhatsAppOrder {
+  id: string;
+  productId: string;
+  productName: string;
+  productImage: string;
+  productCategory: string;
+  price: number;
+  showPrice: boolean;
+  action: WhatsAppOrderAction;
+  whatsappNumber: string;
+  quantity: number;
+  size?: string;
+  color?: string;
+  status: OrderStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const CATEGORIES: CategoryInfo[] = [
-  { slug: 'femme', name: 'Femme', description: 'Mode féminine tendance', image: 'https://img.baba-blog.com/2024/06/the-womens-clothing6.jpg?x-oss-process=style%2Ffull' },
-  { slug: 'homme', name: 'Homme', description: 'Style masculin moderne', image: 'https://img.baba-blog.com/2024/02/boomber-jacket.jpeg?x-oss-process=style%2Ffull' },
-  { slug: 'chaussures', name: 'Chaussures', description: 'Sneakers & chaussures sport', image: 'https://img.baba-blog.com/2025/04/Wholesale-New-Men-Running-Shoes.jpg?x-oss-process=style%2Ffull' },
-  { slug: 'accessoires', name: 'Accessoires', description: 'Montres, bijoux & accessoires', image: 'https://xcimg.szwego.com/img/126da278/20250822/i1755803206442_9024_0_0.jpg' },
+  { slug: 'femmes', name: 'Femmes', description: 'Mode féminine tendance', image: 'https://img.baba-blog.com/2024/06/the-womens-clothing6.jpg?x-oss-process=style%2Ffull' },
+  { slug: 'hommes', name: 'Hommes', description: 'Style masculin moderne', image: 'https://img.baba-blog.com/2024/02/boomber-jacket.jpeg?x-oss-process=style%2Ffull' },
+  { slug: 'sneakers', name: 'Sneakers', description: 'Sneakers & chaussures sport', image: 'https://img.baba-blog.com/2025/04/Wholesale-New-Men-Running-Shoes.jpg?x-oss-process=style%2Ffull' },
   { slug: 'sacs', name: 'Sacs', description: 'Sacs & maroquinerie', image: 'https://xcimg.szwego.com/img/755f7c0e/20231104/i1699103077_4944_0.jpg' },
+  { slug: 'montres', name: 'Montres', description: 'Montres de luxe & sport', image: 'https://xcimg.szwego.com/img/126da278/20250822/i1755803206442_9024_0_0.jpg' },
+  { slug: 'accessoires', name: 'Accessoires', description: 'Bijoux, ceintures & accessoires', image: 'https://img.baba-blog.com/2024/05/flower-choker.jpg?x-oss-process=style%2Ffull' },
+  { slug: 'beaute', name: 'Beauté', description: 'Soins, maquillage & parfums', image: 'https://img.baba-blog.com/2024/06/the-womens-clothing6.jpg?x-oss-process=style%2Ffull' },
+  { slug: 'maison', name: 'Maison', description: 'Décoration & articles maison', image: 'https://img.baba-blog.com/2024/06/the-womens-clothing6.jpg?x-oss-process=style%2Ffull' },
+  { slug: 'electronique', name: 'Électronique', description: 'Gadgets & tech tendance', image: 'https://img.baba-blog.com/2024/06/the-womens-clothing6.jpg?x-oss-process=style%2Ffull' },
+  { slug: 'tendances-tiktok', name: 'Tendances TikTok', description: 'Les produits viraux du moment', image: 'https://img.baba-blog.com/2024/06/the-womens-clothing6.jpg?x-oss-process=style%2Ffull' },
+  { slug: 'promotions', name: 'Promotions', description: 'Offres spéciales & réductions', image: 'https://img.baba-blog.com/2024/06/the-womens-clothing6.jpg?x-oss-process=style%2Ffull' },
+  { slug: 'nouveautes', name: 'Nouveautés', description: 'Les dernières arrivées', image: 'https://img.baba-blog.com/2024/06/the-womens-clothing6.jpg?x-oss-process=style%2Ffull' },
 ];

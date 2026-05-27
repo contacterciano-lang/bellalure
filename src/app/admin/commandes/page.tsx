@@ -25,9 +25,10 @@ import {
   FileText,
   Eye,
   Hash,
+  MessageCircle,
 } from 'lucide-react';
 import { products as staticProducts } from '@/data/products';
-import type { Order, OrderItem, OrderStatus, PaymentMethod, Product, Client } from '@/lib/types';
+import type { Order, OrderItem, OrderStatus, PaymentMethod, Product, Client, WhatsAppOrder } from '@/lib/types';
 import {
   ORDER_STATUSES,
   PAYMENT_METHODS,
@@ -36,10 +37,12 @@ import {
 } from '@/lib/admin/constants';
 import { getItem, setItem, STORAGE_KEYS } from '@/lib/admin/localStorage';
 import { DEFAULT_SETTINGS } from '@/lib/admin/constants';
+import { getWhatsAppOrders, updateOrderStatus as updateWAStatus, deleteWhatsAppOrder } from '@/lib/whatsappOrders';
 
 /* ─── Types ─── */
 
 type StatusTab = 'tous' | OrderStatus;
+type ViewMode = 'whatsapp' | 'orders';
 
 interface NewOrderForm {
   clientName: string;
@@ -314,6 +317,12 @@ export default function OrdersPage() {
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
   const [deletingOrder, setDeletingOrder] = useState<Order | null>(null);
 
+  // WhatsApp orders view
+  const [viewMode, setViewMode] = useState<ViewMode>('whatsapp');
+  const [waOrders, setWaOrders] = useState<WhatsAppOrder[]>([]);
+  const [waSearch, setWaSearch] = useState('');
+  const [waStatusFilter, setWaStatusFilter] = useState<StatusTab>('tous');
+
   // Create form
   const [formData, setFormData] = useState<NewOrderForm>({ ...EMPTY_ORDER_FORM });
   const [createStep, setCreateStep] = useState(1);
@@ -333,6 +342,7 @@ export default function OrdersPage() {
   useEffect(() => {
     setOrders(getItem<Order[]>(STORAGE_KEYS.ORDERS, []));
     setClients(getItem<Client[]>(STORAGE_KEYS.CLIENTS, []));
+    setWaOrders(getWhatsAppOrders());
   }, []);
 
   // Merge static + dynamic products
@@ -641,6 +651,66 @@ export default function OrdersPage() {
     ...ORDER_STATUSES.map((s) => ({ value: s.value as StatusTab, label: s.label })),
   ];
 
+  /* ─── WhatsApp Orders Logic ─── */
+  const waFiltered = useMemo(() => {
+    let list = waOrders;
+    if (waStatusFilter !== 'tous') list = list.filter((o) => o.status === waStatusFilter);
+    if (waSearch) {
+      const q = waSearch.toLowerCase();
+      list = list.filter(
+        (o) =>
+          o.productName.toLowerCase().includes(q) ||
+          o.productCategory.toLowerCase().includes(q),
+      );
+    }
+    return list;
+  }, [waOrders, waStatusFilter, waSearch]);
+
+  const waStatusCounts = useMemo(() => {
+    const counts: Record<string, number> = { tous: waOrders.length };
+    for (const s of ORDER_STATUSES) counts[s.value] = 0;
+    for (const o of waOrders) counts[o.status] = (counts[o.status] || 0) + 1;
+    return counts;
+  }, [waOrders]);
+
+  const handleWAStatusChange = useCallback(
+    (orderId: string, newStatus: OrderStatus) => {
+      updateWAStatus(orderId, newStatus);
+      setWaOrders(getWhatsAppOrders());
+      const label = ORDER_STATUSES.find((s) => s.value === newStatus)?.label || newStatus;
+      showToast(`Statut mis a jour: ${label}`);
+    },
+    [showToast],
+  );
+
+  const handleWADelete = useCallback(
+    (orderId: string) => {
+      deleteWhatsAppOrder(orderId);
+      setWaOrders(getWhatsAppOrders());
+      showToast('Commande WhatsApp supprimee');
+    },
+    [showToast],
+  );
+
+  const waFormatDate = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const waTabs: { value: StatusTab; label: string }[] = [
+    { value: 'tous', label: 'Tous' },
+    ...ORDER_STATUSES.map((s) => ({ value: s.value as StatusTab, label: s.label })),
+  ];
+
   /* ─── Delivery zones from settings ─── */
   const settings = useMemo(() => getItem('bellalure-settings', DEFAULT_SETTINGS), []);
 
@@ -663,23 +733,297 @@ export default function OrdersPage() {
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        className="mb-6"
       >
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Commandes</h1>
-          <p className="mt-0.5 text-sm text-gray-500">
-            {orders.length} commande{orders.length > 1 ? 's' : ''} au total
-          </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Commandes</h1>
+            <p className="mt-0.5 text-sm text-gray-500">
+              {viewMode === 'whatsapp'
+                ? `${waOrders.length} commande${waOrders.length > 1 ? 's' : ''} WhatsApp`
+                : `${orders.length} commande${orders.length > 1 ? 's' : ''} au total`}
+            </p>
+          </div>
+          {viewMode === 'orders' && (
+            <button
+              onClick={openCreateModal}
+              className="flex items-center gap-2 rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800"
+            >
+              <Plus className="h-4 w-4" />
+              Nouvelle commande
+            </button>
+          )}
         </div>
-        <button
-          onClick={openCreateModal}
-          className="flex items-center gap-2 rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800"
-        >
-          <Plus className="h-4 w-4" />
-          Nouvelle commande
-        </button>
+
+        {/* View Mode Tabs */}
+        <div className="mt-4 flex gap-2 border-b border-gray-200 pb-0">
+          <button
+            onClick={() => setViewMode('whatsapp')}
+            className={`flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+              viewMode === 'whatsapp'
+                ? 'border-emerald-600 text-emerald-700'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <MessageCircle className="h-4 w-4" />
+            Nouvelles commandes
+            {waOrders.length > 0 && (
+              <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                viewMode === 'whatsapp' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
+              }`}>
+                {waOrders.length}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setViewMode('orders')}
+            className={`flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+              viewMode === 'orders'
+                ? 'border-gray-900 text-gray-900'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <ShoppingCart className="h-4 w-4" />
+            Commandes classiques
+            {orders.length > 0 && (
+              <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                viewMode === 'orders' ? 'bg-gray-200 text-gray-700' : 'bg-gray-100 text-gray-500'
+              }`}>
+                {orders.length}
+              </span>
+            )}
+          </button>
+        </div>
       </motion.div>
 
+      {/* ═══════ WhatsApp Orders View ═══════ */}
+      {viewMode === 'whatsapp' && (
+        <>
+          {/* WA Search + Status Tabs */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="mb-6 space-y-4"
+          >
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                value={waSearch}
+                onChange={(e) => setWaSearch(e.target.value)}
+                placeholder="Rechercher par produit ou categorie..."
+                className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black"
+              />
+            </div>
+            <div className="flex gap-1 overflow-x-auto pb-1">
+              {waTabs.map((tab) => (
+                <button
+                  key={tab.value}
+                  onClick={() => setWaStatusFilter(tab.value)}
+                  className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                    waStatusFilter === tab.value
+                      ? 'bg-black text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {tab.label}
+                  <span
+                    className={`text-[11px] ${
+                      waStatusFilter === tab.value ? 'text-gray-300' : 'text-gray-400'
+                    }`}
+                  >
+                    {waStatusCounts[tab.value] || 0}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* WA Orders Table */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="rounded-xl border border-gray-200 bg-white shadow-sm"
+          >
+            {waFiltered.length === 0 ? (
+              <div className="flex flex-col items-center py-16 text-center">
+                <MessageCircle className="mb-3 h-12 w-12 text-gray-200" />
+                <p className="text-sm font-medium text-gray-500">
+                  {waOrders.length === 0
+                    ? 'Aucune commande WhatsApp'
+                    : 'Aucune commande trouvee pour ce filtre'}
+                </p>
+                <p className="mt-1 text-xs text-gray-400">
+                  {waOrders.length === 0
+                    ? 'Les commandes apparaitront ici quand un client clique sur "Commander" ou "Demander le prix"'
+                    : 'Modifiez vos filtres ou la recherche'}
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[900px]">
+                  <thead>
+                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                        Produit
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                        Categorie
+                      </th>
+                      <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
+                        Prix
+                      </th>
+                      <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                        Action
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                        Date
+                      </th>
+                      <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                        Statut
+                      </th>
+                      <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {waFiltered.map((wo) => (
+                      <tr
+                        key={wo.id}
+                        className="group transition-colors hover:bg-gray-50/60"
+                      >
+                        {/* Product */}
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                              {wo.productImage ? (
+                                <Image
+                                  src={wo.productImage}
+                                  alt={wo.productName}
+                                  fill
+                                  className="object-cover"
+                                  sizes="40px"
+                                  unoptimized
+                                />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center">
+                                  <Package className="h-4 w-4 text-gray-300" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-medium text-gray-900" title={wo.productName}>
+                                {wo.productName.length > 45
+                                  ? wo.productName.slice(0, 45) + '...'
+                                  : wo.productName}
+                              </p>
+                              <p className="text-[11px] text-gray-400">
+                                Qty: {wo.quantity}
+                                {wo.size && ` · ${wo.size}`}
+                                {wo.color && ` · ${wo.color}`}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Category */}
+                        <td className="px-4 py-3">
+                          <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-[11px] font-medium capitalize text-gray-700">
+                            {wo.productCategory}
+                          </span>
+                        </td>
+
+                        {/* Price */}
+                        <td className="px-4 py-3 text-right">
+                          {wo.showPrice ? (
+                            <span className="text-sm font-semibold text-gray-900">
+                              ${wo.price.toFixed(0)}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700">
+                              <Eye className="h-3 w-3" />
+                              Prix masque
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Action type */}
+                        <td className="px-4 py-3 text-center">
+                          {wo.action === 'commander' ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700">
+                              <ShoppingCart className="h-3 w-3" />
+                              Commander
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700">
+                              <MessageCircle className="h-3 w-3" />
+                              Demande prix
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Date */}
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                            <Clock className="h-3.5 w-3.5 text-gray-400" />
+                            {waFormatDate(wo.createdAt)}
+                          </div>
+                        </td>
+
+                        {/* Status */}
+                        <td className="px-4 py-3 text-center">
+                          <StatusDropdown
+                            currentStatus={wo.status}
+                            onChangeStatus={(status) => handleWAStatusChange(wo.id, status)}
+                          />
+                        </td>
+
+                        {/* Actions */}
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <a
+                              href={`https://wa.me/${wo.whatsappNumber.replace(/[^0-9]/g, '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="rounded-lg p-2 text-emerald-500 hover:bg-emerald-50 hover:text-emerald-700"
+                              title="Ouvrir WhatsApp"
+                            >
+                              <MessageCircle className="h-4 w-4" />
+                            </a>
+                            <button
+                              onClick={() => handleWADelete(wo.id)}
+                              className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                              title="Supprimer"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* WA Footer */}
+            {waFiltered.length > 0 && (
+              <div className="border-t border-gray-100 px-5 py-3">
+                <p className="text-xs text-gray-400">
+                  {waFiltered.length} commande{waFiltered.length > 1 ? 's' : ''} affichee{waFiltered.length > 1 ? 's' : ''}
+                  {waStatusFilter !== 'tous' || waSearch ? ` (filtrees sur ${waOrders.length})` : ''}
+                </p>
+              </div>
+            )}
+          </motion.div>
+        </>
+      )}
+
+      {/* ═══════ Classic Orders View ═══════ */}
+      {viewMode === 'orders' && (
+        <>
       {/* Search + Status Tabs */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -860,6 +1204,8 @@ export default function OrdersPage() {
           </div>
         )}
       </motion.div>
+        </>
+      )}
 
       {/* ═══ Create Order Modal ═══ */}
       <Modal

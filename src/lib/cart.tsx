@@ -103,19 +103,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (items.length === 0) return '';
 
     // Check global price visibility setting
-    let globalHide = false;
+    let globalShow = true;
     try {
       const raw = localStorage.getItem('bellalure-settings');
       if (raw) {
         const settings = JSON.parse(raw);
-        globalHide = !!settings.hidePrices;
+        globalShow = settings.showPrices !== false;
       }
     } catch { /* ignore */ }
 
     let hasHiddenPrice = false;
 
     const lines = items.map((item, i) => {
-      const priceHidden = globalHide || !!item.product.hidePrice;
+      const priceHidden = !globalShow || item.product.showPrice === false;
       if (priceHidden) hasHiddenPrice = true;
 
       let line = `${i + 1}. ${item.product.name}`;

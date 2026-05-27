@@ -53,6 +53,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   orderPrefix: 'BL',
   lowStockThreshold: 5,
   storeOpen: true,
+  showPrices: true,
 };
 
 export function slugify(text: string): string {

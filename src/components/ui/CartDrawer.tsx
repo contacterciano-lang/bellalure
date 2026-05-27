@@ -8,6 +8,7 @@ import { X, Plus, Minus, Trash2, ShoppingBag, MessageCircle } from 'lucide-react
 import { useCart } from '@/lib/cart';
 import { useCurrency } from '@/lib/currency';
 import { usePriceVisibility } from '@/lib/usePriceVisibility';
+import { createWhatsAppOrder } from '@/lib/whatsappOrders';
 
 export default function CartDrawer() {
   const { items, removeItem, updateQuantity, clearCart, itemCount, subtotal, isOpen, closeCart, getWhatsAppUrl } = useCart();
@@ -192,6 +193,18 @@ export default function CartDrawer() {
                     href={getWhatsAppUrl()}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => {
+                      items.forEach((item) => {
+                        const priceHidden = shouldHidePrice(item.product);
+                        createWhatsAppOrder(
+                          item.product,
+                          priceHidden ? 'demande_prix' : 'commander',
+                          item.quantity,
+                          item.size,
+                          item.color,
+                        );
+                      });
+                    }}
                     className="flex w-full items-center justify-center gap-2.5 rounded-full bg-[#25D366] py-4 text-sm font-semibold uppercase tracking-[0.1em] text-white shadow-lg shadow-[#25D366]/20 transition-all hover:bg-[#20BD5B] hover:shadow-xl active:scale-[0.98]"
                   >
                     <MessageCircle className="h-5 w-5" />

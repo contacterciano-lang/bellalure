@@ -173,7 +173,7 @@ export const products: Product[] = [
   // ═══════════════════════════════════
   {
     id: 'fem-001', name: 'Blouse Florale Col V', slug: 'blouse-florale-col-v',
-    category: 'femme', price: 65, currency: 'USD',
+    category: 'femmes', price: 65, currency: 'USD',
     description: 'Blouse légère à imprimé floral, col V élégant. Manches longues fluides, tissu doux.',
     images: [A('2024/06/the-womens-clothing.jpg?x-oss-process=style%2Ffull')],
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
@@ -182,7 +182,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-002', name: 'Chemise Élégante Imprimée', slug: 'chemise-elegante-imprimee',
-    category: 'femme', price: 72, originalPrice: 89, currency: 'USD',
+    category: 'femmes', price: 72, originalPrice: 89, currency: 'USD',
     description: 'Chemise en soie mélangée à imprimé élégant. Col classique, boutons nacre.',
     images: [A('2024/06/the-womens-clothing1.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL'],
@@ -191,7 +191,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-003', name: 'Blouse Chiffon Col Chemise', slug: 'blouse-chiffon-col-chemise',
-    category: 'femme', price: 58, currency: 'USD',
+    category: 'femmes', price: 58, currency: 'USD',
     description: 'Blouse en mousseline de soie imprimée, col chemise rabattu. Tissu aérien et léger.',
     images: [A('2024/06/the-womens-clothing2.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL'],
@@ -200,7 +200,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-004', name: 'Chemise Boutonnée Manches Longues', slug: 'chemise-boutonnee-ml',
-    category: 'femme', price: 68, currency: 'USD',
+    category: 'femmes', price: 68, currency: 'USD',
     description: 'Chemise classique boutonnée, col rabattu. Coupe ajustée, tissu stretch confortable.',
     images: [A('2024/06/the-womens-clothing3.jpg?x-oss-process=style%2Ffull')],
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
@@ -209,7 +209,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-005', name: 'Chemise Vintage Streetwear', slug: 'chemise-vintage-streetwear',
-    category: 'femme', price: 75, originalPrice: 95, currency: 'USD',
+    category: 'femmes', price: 75, originalPrice: 95, currency: 'USD',
     description: 'Chemise oversize style vintage décontracté. Imprimé rétro, coupe loose tendance.',
     images: [A('2024/06/the-womens-clothing4.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL'],
@@ -218,7 +218,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-006', name: 'Ensemble Jupe Deux-Pièces', slug: 'ensemble-jupe-deux-pieces',
-    category: 'femme', price: 89, currency: 'USD',
+    category: 'femmes', price: 89, currency: 'USD',
     description: 'Ensemble casual deux pièces : top crop et jupe assortie. Tissu côtelé confortable.',
     images: [A('2024/06/the-womens-clothing5.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L'],
@@ -227,7 +227,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-007', name: 'Chemise Satin Blanc Élégante', slug: 'chemise-satin-blanc',
-    category: 'femme', price: 78, currency: 'USD',
+    category: 'femmes', price: 78, currency: 'USD',
     description: 'Chemise en satin de soie blanc pur. Col structuré, finitions soignées pour un look chic.',
     images: [A('2024/06/the-womens-clothing6.jpg?x-oss-process=style%2Ffull')],
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
@@ -236,7 +236,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-008', name: 'Robe Mini Bodycon Bustier', slug: 'robe-mini-bodycon-bustier',
-    category: 'femme', price: 85, originalPrice: 110, currency: 'USD',
+    category: 'femmes', price: 85, originalPrice: 110, currency: 'USD',
     description: 'Robe moulante bustier avec fente latérale. Tissu stretch premium, fermeture invisible.',
     images: [A('2024/06/the-womens-clothing7.jpg?x-oss-process=style%2Ffull')],
     sizes: ['XS', 'S', 'M', 'L'],
@@ -245,7 +245,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-009', name: 'Jupe Évasée Rétro A-Line', slug: 'jupe-evasee-retro',
-    category: 'femme', price: 62, currency: 'USD',
+    category: 'femmes', price: 62, currency: 'USD',
     description: 'Jupe évasée style rétro vintage. Taille haute, imprimé classique, longueur midi.',
     images: [A('2024/06/the-womens-clothing8.jpg?x-oss-process=style%2Ffull')],
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
@@ -254,7 +254,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-010', name: 'Blouse Chiffon Marine', slug: 'blouse-chiffon-marine',
-    category: 'femme', price: 55, currency: 'USD',
+    category: 'femmes', price: 55, currency: 'USD',
     description: 'Blouse en chiffon bleu marine, manches courtes. Coupe fluide et légère pour l\'été.',
     images: [A('2024/06/the-womens-clothing9.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL'],
@@ -263,7 +263,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-011', name: 'Top Imprimé Manches Courtes', slug: 'top-imprime-manches-courtes',
-    category: 'femme', price: 45, currency: 'USD',
+    category: 'femmes', price: 45, currency: 'USD',
     description: 'Top basique imprimé logo, manches courtes. Coton premium doux, coupe regular.',
     images: [A('2024/07/the-hot-selling-womens-clothes.jpg?x-oss-process=style%2Ffull')],
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
@@ -272,7 +272,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-012', name: 'Débardeur Cuir Synthétique Noir', slug: 'debardeur-cuir-synthetique',
-    category: 'femme', price: 55, originalPrice: 72, currency: 'USD',
+    category: 'femmes', price: 55, originalPrice: 72, currency: 'USD',
     description: 'Débardeur en simili-cuir noir, col rond. Look rock-chic, doublure intérieure confortable.',
     images: [A('2024/07/the-hot-selling-womens-clothes1.jpg?x-oss-process=style%2Ffull')],
     sizes: ['XS', 'S', 'M', 'L'],
@@ -281,7 +281,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-013', name: 'Legging Sport Push-Up', slug: 'legging-sport-push-up',
-    category: 'femme', price: 42, currency: 'USD',
+    category: 'femmes', price: 42, currency: 'USD',
     description: 'Legging sport taille haute effet push-up. Tissu compressif respirant, coutures flatteuses.',
     images: [A('2024/07/the-hot-selling-womens-clothes2.jpg?x-oss-process=style%2Ffull')],
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
@@ -290,7 +290,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-014', name: 'Ensemble Loungewear Côtelé', slug: 'ensemble-loungewear-cotele',
-    category: 'femme', price: 78, currency: 'USD',
+    category: 'femmes', price: 78, currency: 'USD',
     description: 'Ensemble loungewear en maille côtelée : top et pantalon assorti. Confort premium.',
     images: [A('2024/07/the-hot-selling-womens-clothes3.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL'],
@@ -299,7 +299,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-015', name: 'Combinaison Moulante Côtelée', slug: 'combinaison-moulante-cotelee',
-    category: 'femme', price: 68, originalPrice: 85, currency: 'USD',
+    category: 'femmes', price: 68, originalPrice: 85, currency: 'USD',
     description: 'Combi-short moulante côtelée à bretelles. Tissu extensible, imprimé rayures tendance.',
     images: [A('2024/07/the-hot-selling-womens-clothes4.jpg?x-oss-process=style%2Ffull')],
     sizes: ['XS', 'S', 'M', 'L'],
@@ -308,7 +308,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-016', name: 'Combinaison Fitness Dos Nu', slug: 'combinaison-fitness-dos-nu',
-    category: 'femme', price: 58, currency: 'USD',
+    category: 'femmes', price: 58, currency: 'USD',
     description: 'Combinaison de sport dos nu moulante. Tissu technique respirant, maintien optimal.',
     images: [A('2024/07/the-hot-selling-womens-clothes5.jpg?x-oss-process=style%2Ffull')],
     sizes: ['XS', 'S', 'M', 'L'],
@@ -317,7 +317,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-017', name: 'Débardeur Colorblock U-Neck', slug: 'debardeur-colorblock-uneck',
-    category: 'femme', price: 38, currency: 'USD',
+    category: 'femmes', price: 38, currency: 'USD',
     description: 'Débardeur côtelé col U, bords contrastés colorblock. Coton stretch premium.',
     images: [A('2024/07/the-hot-selling-womens-clothes8.jpg?x-oss-process=style%2Ffull')],
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
@@ -326,7 +326,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-018', name: 'Pantalon Évasé Patchwork', slug: 'pantalon-evase-patchwork',
-    category: 'femme', price: 65, currency: 'USD',
+    category: 'femmes', price: 65, currency: 'USD',
     description: 'Pantalon évasé taille haute avec détails patchwork. Style streetwear féminin unique.',
     images: [A('2024/07/the-hot-selling-womens-clothes9.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL'],
@@ -335,7 +335,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-019', name: 'Ensemble Short Jogger', slug: 'ensemble-short-jogger',
-    category: 'femme', price: 52, currency: 'USD',
+    category: 'femmes', price: 52, currency: 'USD',
     description: 'Ensemble deux pièces : crop top et short jogger. Tissu souple, style sportswear chic.',
     images: [A('2024/05/2-Piece-Shorts-Outfits-Women-Solid-Jogger.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL'],
@@ -344,7 +344,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-020', name: 'Pull Maille Manches Courtes', slug: 'pull-maille-manches-courtes',
-    category: 'femme', price: 58, originalPrice: 75, currency: 'USD',
+    category: 'femmes', price: 58, originalPrice: 75, currency: 'USD',
     description: 'Pull en maille fine manches courtes. Coupe ajustée, texture douce tricot premium.',
     images: [A('2024/05/Short-Sleeves-Knit-T-shirt-Sweater.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L'],
@@ -353,7 +353,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-021', name: 'Robe Moulante Fendue', slug: 'robe-moulante-fendue',
-    category: 'femme', price: 85, currency: 'USD',
+    category: 'femmes', price: 85, currency: 'USD',
     description: 'Robe bustier moulante avec fente haute. Tissu stretch premium, silhouette sculptante.',
     images: [A('2024/05/Strapless-Ladies-Slit-Dress.jpg?x-oss-process=style%2Ffull')],
     sizes: ['XS', 'S', 'M', 'L'],
@@ -362,7 +362,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-022', name: 'Ensemble Mesh Imprimé', slug: 'ensemble-mesh-imprime',
-    category: 'femme', price: 92, currency: 'USD',
+    category: 'femmes', price: 92, currency: 'USD',
     description: 'Ensemble deux pièces : top mesh transparent et bas assorti. Imprimé vague tendance.',
     images: [A('2024/05/Bomblook-Mesh-Outfits-Wave-Print-Top-Two-Piece-Set.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L'],
@@ -371,7 +371,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-023', name: 'Blouse Papillon Manches Longues', slug: 'blouse-papillon-ml',
-    category: 'femme', price: 62, currency: 'USD',
+    category: 'femmes', price: 62, currency: 'USD',
     description: 'Blouse à col rabattu, imprimé papillon délicat. Manches longues, tissu fluide.',
     images: [A('2024/05/Long-Sleeve-Blouse-Women-Turn-Down-Collar-Butterfly-Print.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL'],
@@ -380,7 +380,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-024', name: 'Ensemble Colorblock Short', slug: 'ensemble-colorblock-short',
-    category: 'femme', price: 72, originalPrice: 89, currency: 'USD',
+    category: 'femmes', price: 72, originalPrice: 89, currency: 'USD',
     description: 'Ensemble top manches courtes et short assorti, blocs de couleur contrastés.',
     images: [A('2024/05/Bomblook-Color-Blocking-Short-Sleeve-Top-With-Shorts-Outfits.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L'],
@@ -389,7 +389,7 @@ export const products: Product[] = [
   },
   {
     id: 'fem-025', name: 'Cardigan Plaid Manches Bouffantes', slug: 'cardigan-plaid-bouffantes',
-    category: 'femme', price: 82, currency: 'USD',
+    category: 'femmes', price: 82, currency: 'USD',
     description: 'Cardigan à carreaux avec manches bouffantes. Boutons fantaisie, maille douce.',
     images: [A('2024/05/Colorfaith-Plaid-Chic-Cardigans-Button-Puff-Sleeve.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL'],
@@ -402,7 +402,7 @@ export const products: Product[] = [
   // ═══════════════════════════════════
   {
     id: 'hom-001', name: 'T-Shirt Oversize Distressed', slug: 'tshirt-oversize-distressed',
-    category: 'homme', price: 55, currency: 'USD',
+    category: 'hommes', price: 55, currency: 'USD',
     description: 'T-shirt oversize effet vieilli, 100% coton lourd 300g. Coupe drop-shoulder tendance.',
     images: [A('2024/10/Distressed-Luxury-Men-100-Cotton-Oversized-T-Shirt.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -411,7 +411,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-002', name: 'T-Shirt Acid Wash Vintage', slug: 'tshirt-acid-wash-vintage',
-    category: 'homme', price: 48, currency: 'USD',
+    category: 'hommes', price: 48, currency: 'USD',
     description: 'T-shirt oversize acid wash, coton premium 230g. Effet délavé unique, coupe moderne.',
     images: [A('2024/10/Custom-High-Quality-Vintage-Style-Oversized-Acid-Wash-T-Shirt.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -420,7 +420,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-003', name: 'T-Shirt Coton Premium Logo', slug: 'tshirt-coton-premium-logo',
-    category: 'homme', price: 42, currency: 'USD',
+    category: 'hommes', price: 42, currency: 'USD',
     description: 'T-shirt 100% coton peigné, logo brodé discret. Coupe regular confortable.',
     images: [A('2024/10/Custom-T-Shirt-Printing-Blank-T-Shirt-with-Logo-for-Men-1.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -429,7 +429,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-004', name: 'T-Shirt Oversize Luxe 300GSM', slug: 'tshirt-oversize-luxe-300gsm',
-    category: 'homme', price: 58, originalPrice: 72, currency: 'USD',
+    category: 'hommes', price: 58, originalPrice: 72, currency: 'USD',
     description: 'T-shirt oversize coton lourd 300g/m². Coupe boxy premium, finitions renforcées.',
     images: [A('2024/10/300GSM-Luxury-High-Quality-Plus-Size-Mens-Oversized-T-Shirt.jpg?x-oss-process=style%2Ffull')],
     sizes: ['M', 'L', 'XL', 'XXL', '3XL'],
@@ -438,7 +438,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-005', name: 'Hoodie Heavyweight Oversize', slug: 'hoodie-heavyweight-oversize',
-    category: 'homme', price: 85, currency: 'USD',
+    category: 'hommes', price: 85, currency: 'USD',
     description: 'Sweat à capuche oversize en coton lourd. Poche kangourou, capuche doublée.',
     images: [A('2024/10/Luxury-Heavyweight-Cotton-Unisex-Oversized-Hoodie.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -447,7 +447,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-006', name: 'T-Shirt Vintage Washed', slug: 'tshirt-vintage-washed',
-    category: 'homme', price: 45, currency: 'USD',
+    category: 'hommes', price: 45, currency: 'USD',
     description: 'T-shirt effet vintage délavé, coton premium heavyweight. Aspect usé authentique.',
     images: [A('2024/10/Heavyweight-Vintage-Acid-Washed-Oversized-T-Shirt.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL'],
@@ -456,7 +456,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-007', name: 'Polo Premium Brodé', slug: 'polo-premium-brode',
-    category: 'homme', price: 65, currency: 'USD',
+    category: 'hommes', price: 65, currency: 'USD',
     description: 'Polo en piqué de coton premium, logo brodé. Col structuré, coupe regular fit.',
     images: [A('2024/10/High-Quality-Company-Uniform-Polyester-Mens-Polo-T-Shirt.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -465,7 +465,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-008', name: 'T-Shirt Streetwear 230GSM', slug: 'tshirt-streetwear-230gsm',
-    category: 'homme', price: 38, currency: 'USD',
+    category: 'hommes', price: 38, currency: 'USD',
     description: 'T-shirt streetwear coton 230g, coupe oversized. Col rond renforcé, épaules tombantes.',
     images: [A('2024/10/High-Quality-230GSM-Cotton-Blank-Streetwear-Oversized-T-Shirt.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -474,7 +474,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-009', name: 'Hoodie Full-Zip Logo', slug: 'hoodie-full-zip-logo',
-    category: 'homme', price: 78, originalPrice: 95, currency: 'USD',
+    category: 'hommes', price: 78, originalPrice: 95, currency: 'USD',
     description: 'Sweat zippé à capuche, broderie logo. Coton épais, poches latérales zippées.',
     images: [A('2024/02/hoodie.jpeg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -483,7 +483,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-010', name: 'Polo Golf Classique', slug: 'polo-golf-classique',
-    category: 'homme', price: 55, currency: 'USD',
+    category: 'hommes', price: 55, currency: 'USD',
     description: 'Polo golf en piqué de coton, broderie poitrine. Tissu respirant séchage rapide.',
     images: [A('2024/02/polo-shirt.jpeg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -492,7 +492,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-011', name: 'Polo Heavyweight Premium', slug: 'polo-heavyweight-premium',
-    category: 'homme', price: 68, currency: 'USD',
+    category: 'hommes', price: 68, currency: 'USD',
     description: 'Polo heavyweight en coton piqué épais. Col contrasté, broderie premium.',
     images: [A('2024/02/polo-shirt1.jpeg?x-oss-process=style%2Ffull')],
     sizes: ['M', 'L', 'XL', 'XXL'],
@@ -501,7 +501,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-012', name: 'T-Shirt Col Rond Coton', slug: 'tshirt-col-rond-coton',
-    category: 'homme', price: 35, currency: 'USD',
+    category: 'hommes', price: 35, currency: 'USD',
     description: 'T-shirt basique col rond, 100% coton peigné. Coupe regular, finitions propres.',
     images: [A('2024/02/O-Neck-Mens-T-shirt.jpeg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -510,7 +510,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-013', name: 'Veste Bomber Nylon', slug: 'veste-bomber-nylon',
-    category: 'homme', price: 125, originalPrice: 155, currency: 'USD',
+    category: 'hommes', price: 125, originalPrice: 155, currency: 'USD',
     description: 'Bomber classique en nylon MA1, broderie custom. Col et poignets côtelés, zip YKK.',
     images: [A('2024/02/boomber-jacket.jpeg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -519,7 +519,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-014', name: 'Coupe-Vent Windbreaker', slug: 'coupe-vent-windbreaker',
-    category: 'homme', price: 95, currency: 'USD',
+    category: 'hommes', price: 95, currency: 'USD',
     description: 'Coupe-vent léger à capuche, zip complet. Tissu imperméable, poches zippées.',
     images: [A('2024/02/windbreaker-jacket.jpeg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -528,7 +528,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-015', name: 'Veste Softshell Technique', slug: 'veste-softshell-technique',
-    category: 'homme', price: 115, currency: 'USD',
+    category: 'hommes', price: 115, currency: 'USD',
     description: 'Veste softshell coupe-vent imperméable. Membrane respirante, capuche ajustable.',
     images: [A('2024/02/windbreaker.jpeg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -537,7 +537,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-016', name: 'Doudoune Légère Capuche', slug: 'doudoune-legere-capuche',
-    category: 'homme', price: 135, originalPrice: 175, currency: 'USD',
+    category: 'hommes', price: 135, originalPrice: 175, currency: 'USD',
     description: 'Doudoune légère matelassée, capuche amovible. Garnissage synthétique, ultra-compressible.',
     images: [A('2024/02/down-coat.jpeg?x-oss-process=style%2Ffull')],
     sizes: ['M', 'L', 'XL', 'XXL', '3XL'],
@@ -546,7 +546,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-017', name: 'T-Shirt Luxe Coton Combed', slug: 'tshirt-luxe-coton-combed',
-    category: 'homme', price: 45, currency: 'USD',
+    category: 'hommes', price: 45, currency: 'USD',
     description: 'T-shirt en coton peigné de qualité supérieure. Toucher soyeux, couleurs vives.',
     images: [A('2024/07/the-hot-selling-mens-clothes4.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -555,7 +555,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-018', name: 'Hoodie Camouflage Zip', slug: 'hoodie-camouflage-zip',
-    category: 'homme', price: 89, currency: 'USD',
+    category: 'hommes', price: 89, currency: 'USD',
     description: 'Sweat à capuche imprimé camouflage, zip complet. Coton épais, coupe unisexe.',
     images: [A('2024/07/the-hot-selling-mens-clothes1.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -564,7 +564,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-019', name: 'Short Beach Premium', slug: 'short-beach-premium',
-    category: 'homme', price: 42, currency: 'USD',
+    category: 'hommes', price: 42, currency: 'USD',
     description: 'Short de plage en tissu léger séchage rapide. Taille élastique, poches latérales.',
     images: [A('2024/07/the-hot-selling-mens-clothes2.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -573,7 +573,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-020', name: 'Ensemble Jogger Été', slug: 'ensemble-jogger-ete',
-    category: 'homme', price: 78, currency: 'USD',
+    category: 'hommes', price: 78, currency: 'USD',
     description: 'Ensemble deux pièces jogger d\'été : t-shirt + short assorti. Style sport-chic décontracté.',
     images: [A('2024/07/the-hot-selling-mens-clothes6.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -582,7 +582,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-021', name: 'T-Shirt Vintage Personnalisé', slug: 'tshirt-vintage-personnalise',
-    category: 'homme', price: 48, originalPrice: 62, currency: 'USD',
+    category: 'hommes', price: 48, originalPrice: 62, currency: 'USD',
     description: 'T-shirt vintage avec imprimé graphique personnalisé. Coton 100%, effet usé recherché.',
     images: [A('2024/07/the-hot-selling-mens-clothes7.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL'],
@@ -591,7 +591,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-022', name: 'T-Shirt Sport Respirant', slug: 'tshirt-sport-respirant',
-    category: 'homme', price: 35, currency: 'USD',
+    category: 'hommes', price: 35, currency: 'USD',
     description: 'T-shirt sport 100% polyester respirant. Séchage ultra-rapide, coupe athlétique.',
     images: [A('2024/07/the-hot-selling-mens-clothes8.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -600,7 +600,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-023', name: 'Polo Brodé Golf Premium', slug: 'polo-brode-golf-premium',
-    category: 'homme', price: 62, currency: 'USD',
+    category: 'hommes', price: 62, currency: 'USD',
     description: 'Polo golf broderie logo, coton piqué premium. Col renforcé, patte de boutonnage.',
     images: [A('2024/05/Custom-Embroidery-Golf-Polo-Shirts.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -609,7 +609,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-024', name: 'T-Shirt Oversize Brodé', slug: 'tshirt-oversize-brode',
-    category: 'homme', price: 52, currency: 'USD',
+    category: 'hommes', price: 52, currency: 'USD',
     description: 'T-shirt oversize avec broderie logo premium. Coton épais, coutures renforcées.',
     images: [A('2024/05/Custom-Oversize-Printed-and-Embroidered-T-Shirts.jpg?x-oss-process=style%2Ffull')],
     sizes: ['M', 'L', 'XL', 'XXL'],
@@ -618,7 +618,7 @@ export const products: Product[] = [
   },
   {
     id: 'hom-025', name: 'T-Shirt Gym Compression', slug: 'tshirt-gym-compression',
-    category: 'homme', price: 38, currency: 'USD',
+    category: 'hommes', price: 38, currency: 'USD',
     description: 'T-shirt gym coupe compression. Tissu technique stretch 4 directions, anti-odeur.',
     images: [A('2024/05/Custom-Fitness-Gym-Wear-T-Shirts.jpg?x-oss-process=style%2Ffull')],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -631,7 +631,7 @@ export const products: Product[] = [
   // ═══════════════════════════════════
   {
     id: 'sho-001', name: 'Sneakers Runner Fashion', slug: 'sneakers-runner-fashion',
-    category: 'chaussures', price: 95, currency: 'USD',
+    category: 'sneakers', price: 95, currency: 'USD',
     description: 'Sneakers runner légères, semelle EVA amortissante. Design moderne, mesh respirant.',
     images: [A('2024/02/sneakers1.jpg?x-oss-process=style%2Ffull')],
     sizes: ['39', '40', '41', '42', '43', '44', '45'],
@@ -640,7 +640,7 @@ export const products: Product[] = [
   },
   {
     id: 'sho-002', name: 'Running Shoes Légères', slug: 'running-shoes-legeres',
-    category: 'chaussures', price: 85, originalPrice: 110, currency: 'USD',
+    category: 'sneakers', price: 85, originalPrice: 110, currency: 'USD',
     description: 'Chaussures de course légères, semelle coussin d\'air. Mesh technique haute respirabilité.',
     images: [A('2024/02/sneakers3.jpg?x-oss-process=style%2Ffull')],
     sizes: ['39', '40', '41', '42', '43', '44', '45'],
@@ -649,7 +649,7 @@ export const products: Product[] = [
   },
   {
     id: 'sho-003', name: 'Sneakers Air Cushion Sport', slug: 'sneakers-air-cushion-sport',
-    category: 'chaussures', price: 78, currency: 'USD',
+    category: 'sneakers', price: 78, currency: 'USD',
     description: 'Sneakers sport coussin d\'air élastique. Semelle antidérapante, confort longue durée.',
     images: [A('2024/02/sneakers5.jpg?x-oss-process=style%2Ffull')],
     sizes: ['36', '37', '38', '39', '40', '41', '42'],
@@ -658,7 +658,7 @@ export const products: Product[] = [
   },
   {
     id: 'sho-004', name: 'Hiking Sneakers Anti-Slip', slug: 'hiking-sneakers-anti-slip',
-    category: 'chaussures', price: 105, currency: 'USD',
+    category: 'sneakers', price: 105, currency: 'USD',
     description: 'Sneakers randonnée grande taille 39-49. Mesh respirant, semelle anti-dérapante renforcée.',
     images: [A('2024/02/sneakers7.jpg?x-oss-process=style%2Ffull')],
     sizes: ['39', '40', '41', '42', '43', '44', '45', '46', '47'],
@@ -667,7 +667,7 @@ export const products: Product[] = [
   },
   {
     id: 'sho-005', name: 'Sneakers Mesh Breathable', slug: 'sneakers-mesh-breathable',
-    category: 'chaussures', price: 72, currency: 'USD',
+    category: 'sneakers', price: 72, currency: 'USD',
     description: 'Sneakers casual mesh ultra-respirant. Design mode, semelle légère antidérapante.',
     images: [A('2024/02/sneakers9.jpg?x-oss-process=style%2Ffull')],
     sizes: ['39', '40', '41', '42', '43', '44', '45'],
@@ -676,7 +676,7 @@ export const products: Product[] = [
   },
   {
     id: 'sho-006', name: 'Running Shoes Casual Unisex', slug: 'running-shoes-casual-unisex',
-    category: 'chaussures', price: 68, currency: 'USD',
+    category: 'sneakers', price: 68, currency: 'USD',
     description: 'Chaussures de running casual unisex. Mesh léger, semelle amortissante, style sport.',
     images: [A('2024/02/sneakers10.jpg?x-oss-process=style%2Ffull')],
     sizes: ['36', '37', '38', '39', '40', '41', '42', '43', '44'],
@@ -685,7 +685,7 @@ export const products: Product[] = [
   },
   {
     id: 'sho-007', name: 'Sneakers Runner Design USA', slug: 'sneakers-runner-design-usa',
-    category: 'chaussures', price: 115, originalPrice: 145, currency: 'USD',
+    category: 'sneakers', price: 115, originalPrice: 145, currency: 'USD',
     description: 'Sneakers runner design sportif, semelle épaisse amortissante. Style trainer premium.',
     images: [A('2025/04/Wholesale-New-Men-Running-Shoes.jpg?x-oss-process=style%2Ffull')],
     sizes: ['40', '41', '42', '43', '44', '45'],
@@ -694,7 +694,7 @@ export const products: Product[] = [
   },
   {
     id: 'sho-008', name: 'High-Top Air Cushion Sport', slug: 'high-top-air-cushion',
-    category: 'chaussures', price: 98, currency: 'USD',
+    category: 'sneakers', price: 98, currency: 'USD',
     description: 'Sneakers montantes coussin d\'air. Design futuriste, semelle rebond, tige respirante.',
     images: [A('2025/04/High-Top-Breathable-Air-Cushion-Sports-Running-Shoes.jpg?x-oss-process=style%2Ffull')],
     sizes: ['39', '40', '41', '42', '43', '44', '45'],
@@ -703,7 +703,7 @@ export const products: Product[] = [
   },
   {
     id: 'sho-009', name: 'Sneakers Outdoor Air Cushion', slug: 'sneakers-outdoor-air-cushion',
-    category: 'chaussures', price: 88, currency: 'USD',
+    category: 'sneakers', price: 88, currency: 'USD',
     description: 'Sneakers outdoor avec coussin d\'air visible. Mesh technique, semelle crantée.',
     images: [A('2025/04/Men-Running-Shoes-Air-Cushion-Sports-Shoes.jpg?x-oss-process=style%2Ffull')],
     sizes: ['39', '40', '41', '42', '43', '44', '45'],
@@ -712,7 +712,7 @@ export const products: Product[] = [
   },
   {
     id: 'sho-010', name: 'Basketball Sneakers Height', slug: 'basketball-sneakers-height',
-    category: 'chaussures', price: 108, currency: 'USD',
+    category: 'sneakers', price: 108, currency: 'USD',
     description: 'Sneakers style basketball rehaussantes. Semelle épaisse +5cm, tige montante matelassée.',
     images: [A('2025/04/Height-Increasing-Walking-Shoes-for-Men.jpg?x-oss-process=style%2Ffull')],
     sizes: ['39', '40', '41', '42', '43', '44', '45'],
@@ -721,7 +721,7 @@ export const products: Product[] = [
   },
   {
     id: 'sho-011', name: 'Air Cushion Running Unisex', slug: 'air-cushion-running-unisex',
-    category: 'chaussures', price: 75, originalPrice: 95, currency: 'USD',
+    category: 'sneakers', price: 75, originalPrice: 95, currency: 'USD',
     description: 'Running shoes coussin d\'air, design unisex. Ultra-légères, mesh respirant 360°.',
     images: [A('2025/04/Air-Cushion-Sports-Running-Casual-Shoes.jpg?x-oss-process=style%2Ffull')],
     sizes: ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'],
@@ -730,7 +730,7 @@ export const products: Product[] = [
   },
   {
     id: 'sho-012', name: 'Marathon Sneakers ZoomX', slug: 'marathon-sneakers-zoomx',
-    category: 'chaussures', price: 135, currency: 'USD',
+    category: 'sneakers', price: 135, currency: 'USD',
     description: 'Sneakers marathon haute performance. Semelle carbone, rebond maximal, poids plume.',
     images: [A('2025/04/Explosive-Alphafly-Next-Marathon-Sneakers.jpg?x-oss-process=style%2Ffull')],
     sizes: ['39', '40', '41', '42', '43', '44', '45'],
@@ -739,7 +739,7 @@ export const products: Product[] = [
   },
   {
     id: 'sho-013', name: 'Sneakers Grey Pink Fashion', slug: 'sneakers-grey-pink-fashion',
-    category: 'chaussures', price: 82, currency: 'USD',
+    category: 'sneakers', price: 82, currency: 'USD',
     description: 'Sneakers mode gris et rose, design futuriste. Semelle chunky, tissu innovant.',
     images: [A('2025/05/A-pair-of-grey-and-pink-sneakers.jpg')],
     sizes: ['36', '37', '38', '39', '40', '41', '42'],
@@ -748,7 +748,7 @@ export const products: Product[] = [
   },
   {
     id: 'sho-014', name: 'Hiking Outdoor Grande Taille', slug: 'hiking-outdoor-grande-taille',
-    category: 'chaussures', price: 98, currency: 'USD',
+    category: 'sneakers', price: 98, currency: 'USD',
     description: 'Chaussures randonnée outdoor, grandes tailles disponibles. Imperméable, semelle Vibram.',
     images: [A('2024/02/sneakers8.jpeg?x-oss-process=style%2Ffull')],
     sizes: ['40', '41', '42', '43', '44', '45', '46', '47', '48', '49'],
@@ -757,7 +757,7 @@ export const products: Product[] = [
   },
   {
     id: 'sho-015', name: 'Sports Mesh Lightweight', slug: 'sports-mesh-lightweight',
-    category: 'chaussures', price: 65, currency: 'USD',
+    category: 'sneakers', price: 65, currency: 'USD',
     description: 'Sneakers sport ultra-légères en mesh. Semelle flexible, design épuré pour la marche.',
     images: [A('2024/02/sneakers4.jpeg?x-oss-process=style%2Ffull')],
     sizes: ['36', '37', '38', '39', '40', '41', '42'],

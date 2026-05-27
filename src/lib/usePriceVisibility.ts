@@ -5,33 +5,25 @@ import type { Product, SiteSettings } from '@/lib/types';
 
 const SETTINGS_KEY = 'bellalure-settings';
 
-/**
- * Hook to determine if a product's price should be hidden.
- * Checks both the global `hidePrices` setting and the per-product `hidePrice` flag.
- */
 export function usePriceVisibility() {
-  const [globalHide, setGlobalHide] = useState(false);
+  const [globalShowPrice, setGlobalShowPrice] = useState(true);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(SETTINGS_KEY);
       if (raw) {
         const settings: SiteSettings = JSON.parse(raw);
-        setGlobalHide(!!settings.hidePrices);
+        // showPrices defaults to true when undefined
+        setGlobalShowPrice(settings.showPrices !== false);
       }
-    } catch {
-      /* ignore */
-    }
+    } catch { /* ignore */ }
 
-    // Listen for changes from admin panel (same tab or other tabs)
     const handleStorage = (e: StorageEvent) => {
       if (e.key === SETTINGS_KEY && e.newValue) {
         try {
           const settings: SiteSettings = JSON.parse(e.newValue);
-          setGlobalHide(!!settings.hidePrices);
-        } catch {
-          /* ignore */
-        }
+          setGlobalShowPrice(settings.showPrices !== false);
+        } catch { /* ignore */ }
       }
     };
 
@@ -39,18 +31,15 @@ export function usePriceVisibility() {
     return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
-  /**
-   * Returns true if the price should be hidden for a given product.
-   * Price is hidden when:
-   * - The global `hidePrices` setting is on, OR
-   * - The product's individual `hidePrice` flag is true
-   */
   const shouldHidePrice = useCallback(
     (product: Product): boolean => {
-      return globalHide || !!product.hidePrice;
+      // Price is hidden when global setting is false OR product's showPrice is false
+      if (!globalShowPrice) return true;
+      if (product.showPrice === false) return true;
+      return false;
     },
-    [globalHide],
+    [globalShowPrice],
   );
 
-  return { globalHide, shouldHidePrice };
+  return { globalShowPrice, shouldHidePrice };
 }

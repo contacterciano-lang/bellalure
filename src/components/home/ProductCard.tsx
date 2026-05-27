@@ -9,6 +9,7 @@ import { useCart } from '@/lib/cart';
 import { useWishlist } from '@/lib/wishlist';
 import { useCurrency } from '@/lib/currency';
 import { usePriceVisibility } from '@/lib/usePriceVisibility';
+import { createWhatsAppOrder } from '@/lib/whatsappOrders';
 
 const badgeStyles: Record<string, string> = {
   nouveau: 'bg-black text-white',
@@ -100,7 +101,10 @@ export default function ProductCard({ product }: { product: Product }) {
               href={`https://wa.me/33758167830?text=${encodeURIComponent(`Bonjour Bellalure, je suis intéressé(e) par : ${product.name}. Quel est le prix ?`)}`}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                createWhatsAppOrder(product, 'demande_prix', 1);
+              }}
               className="flex w-full items-center justify-center gap-2 bg-[#25D366] backdrop-blur-sm text-white py-2.5 text-xs tracking-[0.1em] uppercase font-medium hover:bg-[#20BD5B] transition-colors"
             >
               <MessageCircle className="w-3.5 h-3.5" />
@@ -130,7 +134,10 @@ export default function ProductCard({ product }: { product: Product }) {
             href={`https://wa.me/33758167830?text=${encodeURIComponent(`Bonjour Bellalure, je voudrais connaître le prix de : ${product.name}`)}`}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              createWhatsAppOrder(product, 'demande_prix', 1);
+            }}
             className="inline-flex items-center gap-1 text-xs font-semibold text-[#25D366] hover:text-[#20BD5B] transition-colors"
           >
             Prix sur demande

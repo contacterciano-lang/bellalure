@@ -48,12 +48,12 @@ interface ProductFormData {
   newArrival: boolean;
   featured: boolean;
   trending: boolean;
-  hidePrice: boolean;
+  showPrice: boolean;
 }
 
 const EMPTY_FORM: ProductFormData = {
   name: '',
-  category: 'femme',
+  category: 'femmes',
   price: 0,
   originalPrice: 0,
   currency: 'USD',
@@ -67,7 +67,7 @@ const EMPTY_FORM: ProductFormData = {
   newArrival: true,
   featured: false,
   trending: false,
-  hidePrice: false,
+  showPrice: true,
 };
 
 /* ═══════════════════════════════════════════════
@@ -167,13 +167,13 @@ function ProductForm({
     <div className="space-y-5">
       {/* Name */}
       <div>
-        <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
+        <label className="mb-1 block text-xs font-semibold text-gray-900 uppercase">
           Nom du produit *
         </label>
         <input
           value={data.name}
           onChange={(e) => set('name', e.target.value)}
-          className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-black focus:ring-1 focus:ring-black"
           placeholder="Ex: Sac Épaule Souple Chaîne"
         />
       </div>
@@ -181,13 +181,13 @@ function ProductForm({
       {/* Category + Badge */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
+          <label className="mb-1 block text-xs font-semibold text-gray-900 uppercase">
             Catégorie *
           </label>
           <select
             value={data.category}
             onChange={(e) => set('category', e.target.value as Category)}
-            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-black focus:ring-1 focus:ring-black"
           >
             {CATEGORIES.map((c) => (
               <option key={c.slug} value={c.slug}>
@@ -197,13 +197,13 @@ function ProductForm({
           </select>
         </div>
         <div>
-          <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
+          <label className="mb-1 block text-xs font-semibold text-gray-900 uppercase">
             Badge
           </label>
           <select
             value={data.badge}
             onChange={(e) => set('badge', e.target.value as Badge | '')}
-            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-black focus:ring-1 focus:ring-black"
           >
             {BADGE_OPTIONS.map((b) => (
               <option key={b.value} value={b.value}>
@@ -217,7 +217,7 @@ function ProductForm({
       {/* Price + Original Price + Stock */}
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
+          <label className="mb-1 block text-xs font-semibold text-gray-900 uppercase">
             Prix ($) *
           </label>
           <input
@@ -225,11 +225,11 @@ function ProductForm({
             min={0}
             value={data.price || ''}
             onChange={(e) => set('price', Number(e.target.value))}
-            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-black focus:ring-1 focus:ring-black"
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
+          <label className="mb-1 block text-xs font-semibold text-gray-900 uppercase">
             Ancien prix
           </label>
           <input
@@ -237,12 +237,12 @@ function ProductForm({
             min={0}
             value={data.originalPrice || ''}
             onChange={(e) => set('originalPrice', Number(e.target.value))}
-            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-black focus:ring-1 focus:ring-black"
             placeholder="0"
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
+          <label className="mb-1 block text-xs font-semibold text-gray-900 uppercase">
             Stock *
           </label>
           <input
@@ -250,28 +250,28 @@ function ProductForm({
             min={0}
             value={data.stock}
             onChange={(e) => set('stock', Number(e.target.value))}
-            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-black focus:ring-1 focus:ring-black"
           />
         </div>
       </div>
 
       {/* Description */}
       <div>
-        <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
+        <label className="mb-1 block text-xs font-semibold text-gray-900 uppercase">
           Description
         </label>
         <textarea
           value={data.description}
           onChange={(e) => set('description', e.target.value)}
           rows={3}
-          className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-black focus:ring-1 focus:ring-black"
           placeholder="Description du produit..."
         />
       </div>
 
       {/* Images */}
       <div>
-        <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
+        <label className="mb-1 block text-xs font-semibold text-gray-900 uppercase">
           Images
         </label>
         {data.images.length > 0 && (
@@ -344,7 +344,7 @@ function ProductForm({
             value={newImageUrl}
             onChange={(e) => setNewImageUrl(e.target.value)}
             placeholder="Ou coller une URL d'image..."
-            className="flex-1 rounded-lg border border-gray-200 px-4 py-2 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+            className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-black focus:ring-1 focus:ring-black"
             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addImage())}
           />
           <button
@@ -360,7 +360,7 @@ function ProductForm({
 
       {/* Sizes */}
       <div>
-        <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
+        <label className="mb-1 block text-xs font-semibold text-gray-900 uppercase">
           Tailles
         </label>
         <div className="mb-2 flex flex-wrap gap-1.5">
@@ -385,7 +385,7 @@ function ProductForm({
             value={sizeInput}
             onChange={(e) => setSizeInput(e.target.value)}
             placeholder="Ex: M, 42..."
-            className="flex-1 rounded-lg border border-gray-200 px-4 py-2 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+            className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-black focus:ring-1 focus:ring-black"
             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSize())}
           />
           <button
@@ -423,7 +423,7 @@ function ProductForm({
             ['trending', 'Tendance'],
           ] as const
         ).map(([key, label]) => (
-          <label key={key} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+          <label key={key} className="flex items-center gap-2 text-sm text-gray-900 cursor-pointer">
             <input
               type="checkbox"
               checked={data[key] as boolean}
@@ -435,25 +435,35 @@ function ProductForm({
         ))}
       </div>
 
-      {/* Hide price toggle */}
-      <div className="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3">
+      {/* Show/Hide price toggle */}
+      <div className={`flex items-center justify-between rounded-lg border px-4 py-3 ${
+        data.showPrice
+          ? 'border-emerald-200 bg-emerald-50/50'
+          : 'border-amber-200 bg-amber-50/50'
+      }`}>
         <div className="flex items-center gap-2">
-          <EyeOff className="h-4 w-4 text-amber-600" />
+          <EyeOff className={`h-4 w-4 ${data.showPrice ? 'text-emerald-600' : 'text-amber-600'}`} />
           <div>
-            <p className="text-sm font-medium text-gray-900">Masquer le prix</p>
-            <p className="text-xs text-gray-500">Affiche &quot;Prix sur demande&quot; au lieu du prix</p>
+            <p className="text-sm font-medium text-gray-900">
+              {data.showPrice ? 'Prix visible' : 'Prix masqué'}
+            </p>
+            <p className="text-xs text-gray-600">
+              {data.showPrice
+                ? 'Le prix est affiché sur le site'
+                : 'Affiche "Prix sur demande" au lieu du prix'}
+            </p>
           </div>
         </div>
         <button
           type="button"
-          onClick={() => set('hidePrice', !data.hidePrice)}
+          onClick={() => set('showPrice', !data.showPrice)}
           className={`relative inline-flex h-6 w-10 items-center rounded-full transition-colors ${
-            data.hidePrice ? 'bg-amber-500' : 'bg-gray-300'
+            data.showPrice ? 'bg-emerald-500' : 'bg-amber-500'
           }`}
         >
           <span
             className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
-              data.hidePrice ? 'translate-x-5' : 'translate-x-1'
+              data.showPrice ? 'translate-x-5' : 'translate-x-1'
             }`}
           />
         </button>
@@ -462,7 +472,7 @@ function ProductForm({
       {/* Rating + Reviews (compact) */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
+          <label className="mb-1 block text-xs font-semibold text-gray-900 uppercase">
             Note (0-5)
           </label>
           <input
@@ -472,11 +482,11 @@ function ProductForm({
             step={0.1}
             value={data.rating}
             onChange={(e) => set('rating', Number(e.target.value))}
-            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-black focus:ring-1 focus:ring-black"
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-semibold text-gray-500 uppercase">
+          <label className="mb-1 block text-xs font-semibold text-gray-900 uppercase">
             Avis
           </label>
           <input
@@ -484,7 +494,7 @@ function ProductForm({
             min={0}
             value={data.reviews}
             onChange={(e) => set('reviews', Number(e.target.value))}
-            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-black focus:ring-1 focus:ring-black"
           />
         </div>
       </div>
@@ -610,7 +620,7 @@ function ScrapeForm({
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-gray-600">
         Collez un lien Amazon, AliExpress, Alibaba ou tout autre site.
         Les infos du produit seront extraites automatiquement.
       </p>
@@ -621,7 +631,7 @@ function ScrapeForm({
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://www.amazon.com/dp/..."
-            className="w-full rounded-lg border border-gray-200 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+            className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-black focus:ring-1 focus:ring-black"
             onKeyDown={(e) => e.key === 'Enter' && handleScrape()}
           />
         </div>
@@ -791,7 +801,7 @@ export default function ProductsPage() {
       newArrival: product.newArrival || false,
       featured: product.featured || false,
       trending: product.trending || false,
-      hidePrice: product.hidePrice || false,
+      showPrice: product.showPrice !== false,
     });
     setEditingProduct(product);
   };
@@ -818,7 +828,7 @@ export default function ProductsPage() {
         newArrival: formData.newArrival,
         featured: formData.featured,
         trending: formData.trending,
-        hidePrice: formData.hidePrice || undefined,
+        showPrice: formData.showPrice === false ? false : undefined,
       };
 
       const res = await fetch('/api/products', {
@@ -865,7 +875,7 @@ export default function ProductsPage() {
         rating: formData.rating,
         reviews: formData.reviews,
         newArrival: formData.newArrival,
-        hidePrice: formData.hidePrice || undefined,
+        showPrice: formData.showPrice === false ? false : undefined,
       };
 
       const method = isStatic ? 'POST' : 'PATCH';
@@ -990,7 +1000,7 @@ export default function ProductsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher un produit..."
-            className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
+            className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-black focus:ring-1 focus:ring-black"
           />
         </div>
 
@@ -1039,25 +1049,25 @@ export default function ProductsPage() {
             <table className="w-full min-w-[800px]">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/50">
-                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                     Produit
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                     Catégorie
                   </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-700">
                     Prix
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">
                     Stock
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">
                     Badge
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">
                     Source
                   </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-700">
                     Actions
                   </th>
                 </tr>
@@ -1100,10 +1110,10 @@ export default function ProductsPage() {
                     {/* Price */}
                     <td className="px-4 py-3 text-right">
                       <div>
-                        {product.hidePrice ? (
+                        {product.showPrice === false ? (
                           <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700">
                             <EyeOff className="h-3 w-3" />
-                            Masque
+                            Masqué
                           </span>
                         ) : (
                           <>

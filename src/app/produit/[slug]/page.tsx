@@ -32,6 +32,7 @@ import { useCart } from '@/lib/cart';
 import { useWishlist } from '@/lib/wishlist';
 import { useCurrency } from '@/lib/currency';
 import { usePriceVisibility } from '@/lib/usePriceVisibility';
+import { createWhatsAppOrder } from '@/lib/whatsappOrders';
 import Badge from '@/components/ui/Badge';
 import ProductCard from '@/components/home/ProductCard';
 
@@ -761,6 +762,9 @@ export default function ProductDetailPage({
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => {
+                      createWhatsAppOrder(product, 'demande_prix', quantity, selectedSize || undefined, selectedColorName || undefined);
+                    }}
                     className="flex w-full items-center justify-center gap-3 rounded-lg bg-[#25D366] py-4 text-sm font-semibold uppercase tracking-[0.1em] text-white shadow-lg shadow-[#25D366]/20 transition-all hover:bg-[#20BD5B] hover:shadow-xl active:scale-[0.98]"
                     whileTap={{ scale: 0.98 }}
                   >
@@ -812,7 +816,8 @@ export default function ProductDetailPage({
                     }`}
                     whileTap={product.stock > 0 ? { scale: 0.98 } : {}}
                     onClick={(e) => {
-                      if (product.stock === 0) e.preventDefault();
+                      if (product.stock === 0) { e.preventDefault(); return; }
+                      createWhatsAppOrder(product, 'commander', quantity, selectedSize || undefined, selectedColorName || undefined);
                     }}
                   >
                     <MessageCircle className="h-5 w-5" />

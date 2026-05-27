@@ -14,11 +14,18 @@ import type { Category } from '@/lib/types';
 export const dynamic = 'force-dynamic';
 
 const CATEGORIES: { slug: Category; label: string }[] = [
-  { slug: 'femme', label: 'Femme' },
-  { slug: 'homme', label: 'Homme' },
-  { slug: 'chaussures', label: 'Chaussures' },
-  { slug: 'accessoires', label: 'Accessoires' },
+  { slug: 'femmes', label: 'Femmes' },
+  { slug: 'hommes', label: 'Hommes' },
+  { slug: 'sneakers', label: 'Sneakers' },
   { slug: 'sacs', label: 'Sacs' },
+  { slug: 'montres', label: 'Montres' },
+  { slug: 'accessoires', label: 'Accessoires' },
+  { slug: 'beaute', label: 'Beauté' },
+  { slug: 'maison', label: 'Maison' },
+  { slug: 'electronique', label: 'Électronique' },
+  { slug: 'tendances-tiktok', label: 'Tendances TikTok' },
+  { slug: 'promotions', label: 'Promotions' },
+  { slug: 'nouveautes', label: 'Nouveautés' },
 ];
 
 function slugify(text: string): string {

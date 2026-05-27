@@ -7,6 +7,7 @@ export const STORAGE_KEYS = {
   SETTINGS: 'bellalure-settings',
   ADMIN_SESSION: 'bellalure-admin-session',
   ADMIN_PASSWORD: 'bellalure-admin-password',
+  WHATSAPP_ORDERS: 'bellalure-whatsapp-orders',
 } as const;
 
 export function getItem<T>(key: string, defaultValue: T): T {
