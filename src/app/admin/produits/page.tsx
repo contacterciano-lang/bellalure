@@ -19,7 +19,7 @@ import {
   EyeOff,
 } from 'lucide-react';
 import { products as staticProducts } from '@/data/products';
-import type { Product, Badge, Category } from '@/lib/types';
+import type { Product, Badge, Category, ProductStatus } from '@/lib/types';
 import {
   BADGE_OPTIONS,
   SIZE_PRESETS,
@@ -36,8 +36,10 @@ interface ProductFormData {
   name: string;
   category: Category;
   price: number;
+  supplierPrice: number;
   originalPrice: number;
   currency: string;
+  status: ProductStatus;
   description: string;
   images: string[];
   sizes: string[];
@@ -55,8 +57,10 @@ const EMPTY_FORM: ProductFormData = {
   name: '',
   category: 'femmes',
   price: 0,
+  supplierPrice: 0,
   originalPrice: 0,
   currency: 'USD',
+  status: 'active',
   description: '',
   images: [],
   sizes: [],
@@ -252,6 +256,54 @@ function ProductForm({
             onChange={(e) => set('stock', Number(e.target.value))}
             className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-black focus:ring-1 focus:ring-black"
           />
+        </div>
+      </div>
+
+      {/* Prix fournisseur + marge + statut */}
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <label className="mb-1 block text-xs font-semibold text-gray-900 uppercase">
+            Prix fournisseur ($)
+          </label>
+          <input
+            type="number"
+            min={0}
+            value={data.supplierPrice || ''}
+            onChange={(e) => set('supplierPrice', Number(e.target.value))}
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-black focus:ring-1 focus:ring-black"
+            placeholder="0"
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-semibold text-gray-900 uppercase">
+            Marge unitaire
+          </label>
+          <div className={`flex h-[42px] items-center rounded-lg border px-4 text-sm font-semibold ${
+            data.price - data.supplierPrice > 0
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+              : 'border-gray-200 bg-gray-50 text-gray-500'
+          }`}>
+            {formatPrice(Math.max(0, data.price - data.supplierPrice))}
+            {data.price > 0 && data.supplierPrice > 0 && (
+              <span className="ml-1.5 text-xs font-normal">
+                ({Math.round(((data.price - data.supplierPrice) / data.price) * 100)}%)
+              </span>
+            )}
+          </div>
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-semibold text-gray-900 uppercase">
+            Statut
+          </label>
+          <select
+            value={data.status}
+            onChange={(e) => set('status', e.target.value as ProductStatus)}
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-black focus:ring-1 focus:ring-black"
+          >
+            <option value="active">Actif</option>
+            <option value="draft">Brouillon</option>
+            <option value="archived">Archivé</option>
+          </select>
         </div>
       </div>
 
@@ -789,8 +841,10 @@ export default function ProductsPage() {
       name: product.name,
       category: product.category,
       price: product.price,
+      supplierPrice: product.supplierPrice || 0,
       originalPrice: product.originalPrice || 0,
       currency: product.currency,
+      status: product.status || 'active',
       description: product.description,
       images: product.images,
       sizes: product.sizes || [],
@@ -816,6 +870,8 @@ export default function ProductsPage() {
         slug: slugify(formData.name),
         category: formData.category,
         price: formData.price,
+        supplierPrice: formData.supplierPrice,
+        status: formData.status,
         originalPrice: formData.originalPrice || undefined,
         currency: formData.currency || 'USD',
         description: formData.description,
@@ -868,6 +924,8 @@ export default function ProductsPage() {
         slug: slugify(formData.name),
         category: formData.category,
         price: formData.price,
+        supplierPrice: formData.supplierPrice,
+        status: formData.status,
         originalPrice: formData.originalPrice || undefined,
         currency: formData.currency,
         description: formData.description,
