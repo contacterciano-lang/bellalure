@@ -31,6 +31,7 @@ export interface Product {
   featured?: boolean;
   trending?: boolean;
   newArrival?: boolean;
+  hidePrice?: boolean;
 }
 
 export interface CategoryInfo {
@@ -151,6 +152,7 @@ export interface SiteSettings {
   lowStockThreshold: number;
   storeOpen: boolean;
   maintenanceMessage?: string;
+  hidePrices?: boolean;
 }
 
 /* ─── Analytics ─── */

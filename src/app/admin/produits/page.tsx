@@ -16,6 +16,7 @@ import {
   ImagePlus,
   Check,
   AlertTriangle,
+  EyeOff,
 } from 'lucide-react';
 import { products as staticProducts } from '@/data/products';
 import type { Product, Badge, Category } from '@/lib/types';
@@ -47,6 +48,7 @@ interface ProductFormData {
   newArrival: boolean;
   featured: boolean;
   trending: boolean;
+  hidePrice: boolean;
 }
 
 const EMPTY_FORM: ProductFormData = {
@@ -65,6 +67,7 @@ const EMPTY_FORM: ProductFormData = {
   newArrival: true,
   featured: false,
   trending: false,
+  hidePrice: false,
 };
 
 /* ═══════════════════════════════════════════════
@@ -93,6 +96,8 @@ function ProductForm({
 
   const [newImageUrl, setNewImageUrl] = useState('');
   const [sizeInput, setSizeInput] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
   const addImage = () => {
     const url = newImageUrl.trim();
@@ -107,6 +112,45 @@ function ProductForm({
       'images',
       data.images.filter((_, idx) => idx !== i),
     );
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    setUploadError('');
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('images', files[i]);
+    }
+
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const result = await res.json();
+
+      if (!res.ok) {
+        setUploadError(result.error || 'Erreur upload');
+        return;
+      }
+
+      if (result.urls && result.urls.length > 0) {
+        set('images', [...data.images, ...result.urls]);
+      }
+
+      if (result.errors && result.errors.length > 0) {
+        setUploadError(result.errors.join(', '));
+      }
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Erreur réseau');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
 
   const addSize = () => {
     const s = sizeInput.trim().toUpperCase();
@@ -231,15 +275,15 @@ function ProductForm({
           Images
         </label>
         {data.images.length > 0 && (
-          <div className="mb-2 flex flex-wrap gap-2">
+          <div className="mb-3 flex flex-wrap gap-2">
             {data.images.map((img, i) => (
-              <div key={i} className="group relative h-16 w-16 rounded-lg overflow-hidden bg-gray-100">
+              <div key={i} className="group relative h-20 w-20 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
                 <Image
                   src={img}
                   alt={`Image ${i + 1}`}
                   fill
                   className="object-cover"
-                  sizes="64px"
+                  sizes="80px"
                   unoptimized
                 />
                 <button
@@ -249,15 +293,57 @@ function ProductForm({
                 >
                   <Trash2 className="h-4 w-4 text-white" />
                 </button>
+                {i === 0 && (
+                  <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-center text-[9px] font-bold text-white py-0.5">
+                    PRINCIPALE
+                  </span>
+                )}
               </div>
             ))}
           </div>
         )}
+
+        {/* Upload depuis galerie */}
+        <div className="mb-2">
+          <label
+            className={`flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-4 text-sm font-medium transition-colors hover:border-black hover:bg-gray-50 ${
+              uploading ? 'opacity-50 pointer-events-none' : 'text-gray-600'
+            }`}
+          >
+            {uploading ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Upload en cours...
+              </>
+            ) : (
+              <>
+                <ImagePlus className="h-5 w-5" />
+                Ajouter depuis la galerie
+              </>
+            )}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              multiple
+              className="hidden"
+              onChange={handleFileUpload}
+              disabled={uploading}
+            />
+          </label>
+          <p className="mt-1 text-[11px] text-gray-400">
+            JPEG, PNG, WebP ou GIF — max 5 MB par image — jusqu&apos;à 10 images
+          </p>
+          {uploadError && (
+            <p className="mt-1 text-xs text-red-600">{uploadError}</p>
+          )}
+        </div>
+
+        {/* Ou ajouter par URL */}
         <div className="flex gap-2">
           <input
             value={newImageUrl}
             onChange={(e) => setNewImageUrl(e.target.value)}
-            placeholder="https://..."
+            placeholder="Ou coller une URL d'image..."
             className="flex-1 rounded-lg border border-gray-200 px-4 py-2 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addImage())}
           />
@@ -266,8 +352,8 @@ function ProductForm({
             onClick={addImage}
             className="flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
           >
-            <ImagePlus className="h-4 w-4" />
-            Ajouter
+            <LinkIcon className="h-4 w-4" />
+            URL
           </button>
         </div>
       </div>
@@ -347,6 +433,30 @@ function ProductForm({
             {label}
           </label>
         ))}
+      </div>
+
+      {/* Hide price toggle */}
+      <div className="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <EyeOff className="h-4 w-4 text-amber-600" />
+          <div>
+            <p className="text-sm font-medium text-gray-900">Masquer le prix</p>
+            <p className="text-xs text-gray-500">Affiche &quot;Prix sur demande&quot; au lieu du prix</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => set('hidePrice', !data.hidePrice)}
+          className={`relative inline-flex h-6 w-10 items-center rounded-full transition-colors ${
+            data.hidePrice ? 'bg-amber-500' : 'bg-gray-300'
+          }`}
+        >
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
+              data.hidePrice ? 'translate-x-5' : 'translate-x-1'
+            }`}
+          />
+        </button>
       </div>
 
       {/* Rating + Reviews (compact) */}
@@ -681,6 +791,7 @@ export default function ProductsPage() {
       newArrival: product.newArrival || false,
       featured: product.featured || false,
       trending: product.trending || false,
+      hidePrice: product.hidePrice || false,
     });
     setEditingProduct(product);
   };
@@ -707,6 +818,7 @@ export default function ProductsPage() {
         newArrival: formData.newArrival,
         featured: formData.featured,
         trending: formData.trending,
+        hidePrice: formData.hidePrice || undefined,
       };
 
       const res = await fetch('/api/products', {
@@ -753,6 +865,7 @@ export default function ProductsPage() {
         rating: formData.rating,
         reviews: formData.reviews,
         newArrival: formData.newArrival,
+        hidePrice: formData.hidePrice || undefined,
       };
 
       const method = isStatic ? 'POST' : 'PATCH';
@@ -987,13 +1100,22 @@ export default function ProductsPage() {
                     {/* Price */}
                     <td className="px-4 py-3 text-right">
                       <div>
-                        <p className="text-sm font-semibold text-gray-900">
-                          {formatPrice(product.price)}
-                        </p>
-                        {product.originalPrice && product.originalPrice > product.price && (
-                          <p className="text-[11px] text-gray-400 line-through">
-                            {formatPrice(product.originalPrice)}
-                          </p>
+                        {product.hidePrice ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700">
+                            <EyeOff className="h-3 w-3" />
+                            Masque
+                          </span>
+                        ) : (
+                          <>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {formatPrice(product.price)}
+                            </p>
+                            {product.originalPrice && product.originalPrice > product.price && (
+                              <p className="text-[11px] text-gray-400 line-through">
+                                {formatPrice(product.originalPrice)}
+                              </p>
+                            )}
+                          </>
                         )}
                       </div>
                     </td>

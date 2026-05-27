@@ -300,6 +300,59 @@ function GeneralSection({
         </div>
       </SettingsCard>
 
+      <SettingsCard
+        title="Visibilite des prix"
+        description="Masquer les prix sur la boutique. Les clients devront contacter via WhatsApp pour connaitre les prix."
+      >
+        <div className="space-y-5">
+          {/* Hide Prices toggle */}
+          <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/50 px-4 py-4">
+            <div>
+              <p className="text-sm font-medium text-gray-900">
+                {form.hidePrices ? 'Prix masques' : 'Prix affiches'}
+              </p>
+              <p className="mt-0.5 text-xs text-gray-500">
+                {form.hidePrices
+                  ? 'Les prix sont caches. "Prix sur demande" est affiche a la place'
+                  : 'Les prix sont visibles pour tous les produits'}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setForm((prev) => ({ ...prev, hidePrices: !prev.hidePrices }))}
+              className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
+                form.hidePrices ? 'bg-amber-500' : 'bg-gray-300'
+              }`}
+            >
+              <span
+                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${
+                  form.hidePrices ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+
+          {form.hidePrices && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="flex items-start gap-2 rounded-lg bg-amber-50 px-4 py-3"
+            >
+              <EyeOff className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
+              <div className="text-xs text-amber-700">
+                <p className="font-medium">Mode global active</p>
+                <p className="mt-0.5">
+                  Tous les prix sont masques sur la boutique. Les clients verront
+                  &quot;Prix sur demande&quot; avec un lien WhatsApp. Vous pouvez aussi masquer
+                  les prix individuellement par produit depuis la page Produits.
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      </SettingsCard>
+
       {/* Save button */}
       <div className="flex justify-end">
         <button

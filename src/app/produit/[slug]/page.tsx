@@ -31,6 +31,7 @@ import { getWhatsAppUrl, siteConfig } from '@/lib/config';
 import { useCart } from '@/lib/cart';
 import { useWishlist } from '@/lib/wishlist';
 import { useCurrency } from '@/lib/currency';
+import { usePriceVisibility } from '@/lib/usePriceVisibility';
 import Badge from '@/components/ui/Badge';
 import ProductCard from '@/components/home/ProductCard';
 
@@ -459,6 +460,7 @@ export default function ProductDetailPage({
   const { addItem } = useCart();
   const { toggle, has } = useWishlist();
   const { format } = useCurrency();
+  const { shouldHidePrice } = usePriceVisibility();
 
   const categoryInfo = CATEGORIES.find((c) => c.slug === product?.category);
 
@@ -487,7 +489,8 @@ export default function ProductDetailPage({
     notFound();
   }
 
-  const hasPromo = product.originalPrice && product.originalPrice > product.price;
+  const priceHidden = shouldHidePrice(product);
+  const hasPromo = !priceHidden && product.originalPrice && product.originalPrice > product.price;
   const discount = hasPromo
     ? Math.round(
         ((product.originalPrice! - product.price) / product.originalPrice!) *
@@ -609,21 +612,32 @@ export default function ProductDetailPage({
             </div>
 
             {/* Price */}
-            <div className="mt-5 flex items-baseline gap-3">
-              <span className="text-3xl font-semibold text-black">
-                {format(product.price)}
-              </span>
-              {hasPromo && (
-                <>
-                  <span className="text-lg text-black/30 line-through">
-                    {format(product.originalPrice!)}
-                  </span>
-                  <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700">
-                    -{discount}%
-                  </span>
-                </>
-              )}
-            </div>
+            {priceHidden ? (
+              <div className="mt-5 flex items-center gap-3">
+                <span className="rounded-lg bg-[#25D366]/10 px-4 py-2 text-sm font-semibold text-[#25D366]">
+                  Prix sur demande
+                </span>
+                <span className="text-xs text-black/40">
+                  Contactez-nous via WhatsApp
+                </span>
+              </div>
+            ) : (
+              <div className="mt-5 flex items-baseline gap-3">
+                <span className="text-3xl font-semibold text-black">
+                  {format(product.price)}
+                </span>
+                {hasPromo && (
+                  <>
+                    <span className="text-lg text-black/30 line-through">
+                      {format(product.originalPrice!)}
+                    </span>
+                    <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700">
+                      -{discount}%
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Short description */}
             <p className="mt-5 text-sm leading-relaxed text-black/60">
@@ -728,7 +742,7 @@ export default function ProductDetailPage({
                   setQuantity={setQuantity}
                   max={product.stock}
                 />
-                {quantity > 1 && (
+                {!priceHidden && quantity > 1 && (
                   <span className="text-sm text-black/40">
                     Total : <span className="font-semibold text-black/70">{format(product.price * quantity)}</span>
                   </span>
@@ -738,39 +752,74 @@ export default function ProductDetailPage({
 
             {/* CTA Buttons */}
             <div className="flex flex-col gap-3">
-              {/* Add to cart - primary */}
-              <motion.button
-                onClick={handleAddToCart}
-                disabled={product.stock === 0}
-                className={`flex w-full items-center justify-center gap-3 rounded-lg py-4 text-sm font-semibold uppercase tracking-[0.1em] transition-all ${
-                  product.stock === 0
-                    ? 'cursor-not-allowed bg-black/10 text-black/30'
-                    : 'bg-black text-white shadow-lg shadow-black/15 hover:bg-[#C9A96E] hover:text-black hover:shadow-xl hover:shadow-[#C9A96E]/20 active:scale-[0.98]'
-                }`}
-                whileTap={product.stock > 0 ? { scale: 0.98 } : {}}
-              >
-                <ShoppingBag className="h-5 w-5" />
-                Ajouter au panier
-              </motion.button>
+              {priceHidden ? (
+                <>
+                  {/* WhatsApp - primary when price hidden */}
+                  <motion.a
+                    href={`https://wa.me/33758167830?text=${encodeURIComponent(
+                      `Bonjour Bellalure !\n\nJe suis intéressé(e) par : ${product.name}${selectedSize ? `\nTaille: ${selectedSize}` : ''}${selectedColorName ? `\nCouleur: ${selectedColorName}` : ''}${quantity > 1 ? `\nQuantité: ${quantity}` : ''}\n\nPouvez-vous me communiquer le prix svp ?`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex w-full items-center justify-center gap-3 rounded-lg bg-[#25D366] py-4 text-sm font-semibold uppercase tracking-[0.1em] text-white shadow-lg shadow-[#25D366]/20 transition-all hover:bg-[#20BD5B] hover:shadow-xl active:scale-[0.98]"
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <MessageCircle className="h-5 w-5" />
+                    Demander le prix via WhatsApp
+                  </motion.a>
 
-              {/* WhatsApp order - secondary */}
-              <motion.a
-                href={whatsAppUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex w-full items-center justify-center gap-3 rounded-lg border-2 py-3.5 text-sm font-semibold uppercase tracking-[0.1em] transition-all ${
-                  product.stock === 0
-                    ? 'pointer-events-none border-black/5 text-black/20'
-                    : 'border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white active:scale-[0.98]'
-                }`}
-                whileTap={product.stock > 0 ? { scale: 0.98 } : {}}
-                onClick={(e) => {
-                  if (product.stock === 0) e.preventDefault();
-                }}
-              >
-                <MessageCircle className="h-5 w-5" />
-                Commander via WhatsApp
-              </motion.a>
+                  {/* Add to cart - secondary when price hidden */}
+                  <motion.button
+                    onClick={handleAddToCart}
+                    disabled={product.stock === 0}
+                    className={`flex w-full items-center justify-center gap-3 rounded-lg border-2 py-3.5 text-sm font-semibold uppercase tracking-[0.1em] transition-all ${
+                      product.stock === 0
+                        ? 'cursor-not-allowed border-black/5 text-black/20'
+                        : 'border-black text-black hover:bg-black hover:text-white active:scale-[0.98]'
+                    }`}
+                    whileTap={product.stock > 0 ? { scale: 0.98 } : {}}
+                  >
+                    <ShoppingBag className="h-5 w-5" />
+                    Ajouter au panier
+                  </motion.button>
+                </>
+              ) : (
+                <>
+                  {/* Add to cart - primary */}
+                  <motion.button
+                    onClick={handleAddToCart}
+                    disabled={product.stock === 0}
+                    className={`flex w-full items-center justify-center gap-3 rounded-lg py-4 text-sm font-semibold uppercase tracking-[0.1em] transition-all ${
+                      product.stock === 0
+                        ? 'cursor-not-allowed bg-black/10 text-black/30'
+                        : 'bg-black text-white shadow-lg shadow-black/15 hover:bg-[#C9A96E] hover:text-black hover:shadow-xl hover:shadow-[#C9A96E]/20 active:scale-[0.98]'
+                    }`}
+                    whileTap={product.stock > 0 ? { scale: 0.98 } : {}}
+                  >
+                    <ShoppingBag className="h-5 w-5" />
+                    Ajouter au panier
+                  </motion.button>
+
+                  {/* WhatsApp order - secondary */}
+                  <motion.a
+                    href={whatsAppUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex w-full items-center justify-center gap-3 rounded-lg border-2 py-3.5 text-sm font-semibold uppercase tracking-[0.1em] transition-all ${
+                      product.stock === 0
+                        ? 'pointer-events-none border-black/5 text-black/20'
+                        : 'border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white active:scale-[0.98]'
+                    }`}
+                    whileTap={product.stock > 0 ? { scale: 0.98 } : {}}
+                    onClick={(e) => {
+                      if (product.stock === 0) e.preventDefault();
+                    }}
+                  >
+                    <MessageCircle className="h-5 w-5" />
+                    Commander via WhatsApp
+                  </motion.a>
+                </>
+              )}
             </div>
 
             {/* Delivery info bar */}

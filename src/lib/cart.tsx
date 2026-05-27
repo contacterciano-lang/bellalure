@@ -101,14 +101,34 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const getWhatsAppMessage = useCallback(() => {
     if (items.length === 0) return '';
+
+    // Check global price visibility setting
+    let globalHide = false;
+    try {
+      const raw = localStorage.getItem('bellalure-settings');
+      if (raw) {
+        const settings = JSON.parse(raw);
+        globalHide = !!settings.hidePrices;
+      }
+    } catch { /* ignore */ }
+
+    let hasHiddenPrice = false;
+
     const lines = items.map((item, i) => {
+      const priceHidden = globalHide || !!item.product.hidePrice;
+      if (priceHidden) hasHiddenPrice = true;
+
       let line = `${i + 1}. ${item.product.name}`;
       if (item.size) line += ` | Taille: ${item.size}`;
       if (item.color) line += ` | Couleur: ${item.color}`;
       line += ` | Qty: ${item.quantity}`;
-      line += ` | $${(item.product.price * item.quantity).toFixed(2)}`;
+      line += priceHidden ? ` | Prix: a confirmer` : ` | $${(item.product.price * item.quantity).toFixed(2)}`;
       return line;
     });
+
+    const footer = hasHiddenPrice
+      ? `Merci de me communiquer les prix et confirmer la disponibilite.`
+      : `Total : $${subtotal.toFixed(2)}\n\nMerci de confirmer la disponibilite et les frais de livraison.`;
 
     return [
       `Bonjour Bellalure !`,
@@ -117,9 +137,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       ``,
       ...lines,
       ``,
-      `Total : $${subtotal.toFixed(2)}`,
-      ``,
-      `Merci de confirmer la disponibilite et les frais de livraison.`,
+      footer,
     ].join('\n');
   }, [items, subtotal]);
 

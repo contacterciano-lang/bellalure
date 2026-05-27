@@ -7,10 +7,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Minus, Trash2, ShoppingBag, MessageCircle } from 'lucide-react';
 import { useCart } from '@/lib/cart';
 import { useCurrency } from '@/lib/currency';
+import { usePriceVisibility } from '@/lib/usePriceVisibility';
 
 export default function CartDrawer() {
   const { items, removeItem, updateQuantity, clearCart, itemCount, subtotal, isOpen, closeCart, getWhatsAppUrl } = useCart();
   const { format } = useCurrency();
+  const { shouldHidePrice } = usePriceVisibility();
+  const anyHiddenPrice = items.some((item) => shouldHidePrice(item.product));
+  const allHiddenPrice = items.length > 0 && items.every((item) => shouldHidePrice(item.product));
 
   return (
     <AnimatePresence>
@@ -140,7 +144,11 @@ export default function CartDrawer() {
                               {/* Price + delete */}
                               <div className="flex items-center gap-2">
                                 <span className="text-sm font-semibold">
-                                  {format(item.product.price * item.quantity)}
+                                  {shouldHidePrice(item.product) ? (
+                                    <span className="text-xs text-[#25D366]">Sur demande</span>
+                                  ) : (
+                                    format(item.product.price * item.quantity)
+                                  )}
                                 </span>
                                 <button
                                   onClick={() => removeItem(item.product.id, item.size, item.color)}
@@ -162,10 +170,21 @@ export default function CartDrawer() {
                   {/* Subtotal */}
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-black/50">Sous-total</span>
-                    <span className="text-lg font-semibold">{format(subtotal)}</span>
+                    {allHiddenPrice ? (
+                      <span className="text-sm font-semibold text-[#25D366]">Prix sur demande</span>
+                    ) : anyHiddenPrice ? (
+                      <div className="text-right">
+                        <span className="text-lg font-semibold">{format(subtotal)}</span>
+                        <span className="block text-[10px] text-[#25D366]">+ articles sur demande</span>
+                      </div>
+                    ) : (
+                      <span className="text-lg font-semibold">{format(subtotal)}</span>
+                    )}
                   </div>
                   <p className="text-[11px] text-black/30">
-                    Frais de livraison calcules apres confirmation WhatsApp
+                    {anyHiddenPrice
+                      ? 'Certains prix seront communiques via WhatsApp'
+                      : 'Frais de livraison calcules apres confirmation WhatsApp'}
                   </p>
 
                   {/* WhatsApp CTA */}
@@ -176,7 +195,7 @@ export default function CartDrawer() {
                     className="flex w-full items-center justify-center gap-2.5 rounded-full bg-[#25D366] py-4 text-sm font-semibold uppercase tracking-[0.1em] text-white shadow-lg shadow-[#25D366]/20 transition-all hover:bg-[#20BD5B] hover:shadow-xl active:scale-[0.98]"
                   >
                     <MessageCircle className="h-5 w-5" />
-                    Commander via WhatsApp
+                    {anyHiddenPrice ? 'Demander les prix via WhatsApp' : 'Commander via WhatsApp'}
                   </a>
 
                   {/* Clear cart */}
